@@ -213,6 +213,21 @@ if (-not $script:ENGAPPS.Count) {
 if (-not $script:ENGAPPS.Count) {
     $script:ENGAPPS = @($script:AppsConfig.apps.PSObject.Properties.Name | Where-Object { $_ -notlike '_*' } | Select-Object -First 12)
 }
+# Designer fixture: three buildings so the grid looks like a campus, ENG
+# carrying rules (purple), the others grey - matches the tracker's fleet.
+$script:BuildingsConfig = [pscustomobject]@{
+    buildings = [pscustomobject]@{
+        '10' = [pscustomobject]@{ abbr = 'MAIN'; fullName = 'Main Hall' }
+        '20' = [pscustomobject]@{ abbr = 'ENG';  fullName = 'Engineering' }
+        '30' = [pscustomobject]@{ abbr = 'SCI';  fullName = 'Science Center' }
+    }
+    roomSizes = [pscustomobject]@{ '20-103' = 48; '20-205' = 12; '10-101' = 24; '30-150' = 18 }
+    typeCodes = [pscustomobject]@{ LAB = [pscustomobject]@{ machine01Role = 'ask' } }
+}
+$script:RulesConfig = [pscustomobject]@{ rules = @(
+    [pscustomobject]@{ building = '20'; rooms = '103'; types = ''; machines = '1-48'; apps = @($script:ENGAPPS) },
+    [pscustomobject]@{ building = '20'; rooms = '205'; types = ''; machines = '1-12'; apps = @($script:ENGAPPS) }
+) }
 function Get-FleetRollup {
     # Screenshot fleet: 3 buildings, 4 rooms, 98 machines. Mostly green, with
     # every tile state present: yellow (partial), red (failed), purple (GP/CM
@@ -232,7 +247,10 @@ function Get-FleetRollup {
             foreach ($a in $script:ENGAPPS) { $inst[$a] = $true }
             $fail = New-Object System.Collections.ArrayList
             $cmOk = $true; $cmLast = (Get-Date '2026-08-20 09:00')
-            if ($rm.R -eq '103' -and $n -eq 19) { $inst.Remove(@($script:ENGAPPS)[0]) }
+            if ($rm.R -eq '103' -and $n -in 19, 27, 33) { $inst.Remove(@($script:ENGAPPS)[0]) }
+            if ($rm.R -eq '103' -and $n -eq 36) { $inst = @{}; [void]$fail.Add('Vivado E23 @ 08-21 09:12') }
+            if ($rm.R -eq '205' -and $n -eq 7)  { $inst.Remove(@($script:ENGAPPS)[0]) }
+            if ($rm.R -eq '205' -and $n -eq 10) { $inst = @{}; [void]$fail.Add('LabVIEW E26 @ 08-20 16:44') }
             if ($rm.R -eq '101' -and $n -eq 13) { $inst.Remove(@($script:ENGAPPS)[0]) }
             if ($rm.R -eq '103' -and $n -eq 2)  { $inst = @{}; [void]$fail.Add('RockwellCCW E26 @ 08-20 14:02') }
             if ($rm.R -eq '150' -and $n -eq 12) { $inst = @{}; [void]$fail.Add('MATLAB E23 @ 08-19 11:40') }
