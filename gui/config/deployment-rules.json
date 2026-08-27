@@ -1,0 +1,11 @@
+{
+  "_note": "Machine-range rules: WHICH machines get WHICH apps, at building/room/machine-number granularity. Normally authored visually in Rooms & Rules -> Designer ('SAVE this room' writes this file, keeping a .bak). A rule either carries its own apps array (order = install order) or points at a rooms.json profile. The Designer also stores per-room health-chip settings here under roomHealth. Ships EMPTY - see _example_rule for the shape.",
+  "_example_rule": {
+    "building": "10",
+    "rooms": "101",
+    "types": "",
+    "machines": "1-24",
+    "apps": ["VLC", "Python", "VSCode"]
+  },
+  "rules": []
+}

@@ -1,0 +1,60 @@
+; Git for Windows unattended answer file for ENG 5105 (CSE laptops).
+;
+; WHY THIS FILE EXISTS: the guide's three "Required Options" for Git are
+;   1. Install for all users
+;   2. Enable Git Credential Manager
+;   3. Add Git to PATH
+; All three ARE the silent defaults today, but "today's default" is not a
+; contract - Git for Windows has changed installer defaults between releases
+; (the credential helper switched from wincred to GCM, the PATH page gained a
+; new option). Writing them down means a future Git build cannot quietly
+; change what a 5105 laptop gets. This is the vendor's own /SAVEINF format, so
+; it stays valid across versions; unknown keys are ignored, not fatal.
+;
+; TO REGENERATE after a Git version bump: run the installer by hand with
+;   Git-64-bit.exe /SAVEINF="git-lab.inf"
+; tick the options you want, and diff the result against this file.
+
+[Setup]
+Lang=default
+Dir=C:\Program Files\Git
+Group=Git
+NoIcons=0
+; No Components= line ON PURPOSE. SetupType=default tells Inno to use the
+; installer's own default component set; pairing that with a hand-written
+; Components list is contradictory (a real /SAVEINF of a customised run writes
+; SetupType=custom), and pinning component NAMES across Git versions is exactly
+; the kind of silent rot this file exists to prevent. The three required
+; options do not live in Components anyway.
+SetupType=default
+Tasks=
+; Notepad, not the vendor default (vim). On a student lab machine, `git commit`
+; without -m dropping a first-year into vim is a guaranteed help-desk ticket -
+; they cannot type, cannot save, and cannot exit. Notepad ships on every image
+; and needs no instructions. Course staff who want a different editor set
+; core.editor per repo or per user; this only picks the machine default.
+EditorOption=Notepad
+CustomEditorPath=
+DefaultBranchOption=main
+; Cmd = "Git from the command line and also from 3rd-party software" - puts
+; C:\Program Files\Git\cmd on the SYSTEM PATH. This is requirement 3, and it is
+; also what makes GitHub Desktop, IntelliJ and CLion auto-detect Git rather
+; than asking each student to point at it.
+PathOption=Cmd
+SSHOption=OpenSSH
+TortoiseOption=false
+CURLOption=WinSSL
+CRLFOption=CRLFAlways
+BashTerminalOption=MinTTY
+GitPullBehaviorOption=Merge
+; Requirement 2. Enabled = Git Credential Manager (the cross-platform GCM that
+; ships in the installer), which is what students need to authenticate to
+; GitHub over HTTPS without re-typing a token every push.
+UseCredentialManager=Enabled
+PerformanceTweaksFSCache=Enabled
+EnableSymlinks=Default
+EnablePseudoConsoleSupport=Disabled
+; FSMonitor spawns a background daemon per repository. Fine on a personal
+; machine, wrong on a shared lab laptop where every student leaves clones
+; behind - deliberately off.
+EnableFSMonitor=Disabled

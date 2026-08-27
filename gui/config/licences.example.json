@@ -1,0 +1,9 @@
+{
+  "_note": "TEMPLATE - copy to licences.json and fill in the real codes. licences.json is gitignored and NEVER committed; this example is committed so a fresh clone knows the file is required and what shape it takes.",
+  "_why": "Vendor licence codes used to sit inline in config/apps.json, which meant every commit published them and every clone carried them. They now live in this file instead, and apps.json carries {{TOKEN}} placeholders that Expand-LicenceTokens resolves at install time.",
+  "_it_still_ships_to_sticks": "licences.json is excluded from GIT, not from the stick mirror. A stick without it cannot licence LabChart or Lt LabStation, and the failure appears mid-deployment as [E73]. It is in $script:MasterConfigFiles so Publish-ConfigToStaging copies it into the staging tree that sticks mirror from.",
+  "_adding_a_new_code": "1. add \"MY_TOKEN\": \"THE-CODE\" here; 2. put {{MY_TOKEN}} where the code used to be in apps.json; 3. that is all - no code change, Expand-LicenceTokens resolves any {{NAME}} it finds.",
+
+  "LABCHART_SCI_CODE": "XXXX-XXXX-XXXX",
+  "LTLABSTATION_CODE": "XXXX-XXXX-XXXX-X"
+}

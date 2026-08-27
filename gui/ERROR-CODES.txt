@@ -1,0 +1,60 @@
+LABLIFTER - ERROR CODE QUICK REFERENCE
+(plain-text twin of ERROR-CODES.md; codes are append-only, never renumbered)
+Report format: "<code> on <app name>", e.g. "E21 on LabVIEW"
+
+STARTUP / CONFIG
+  E01  rooms.json missing                -> recopy LabDeploy\config from staging
+  E02  apps.json missing                 -> recopy LabDeploy\config from staging
+  E03  config file not valid JSON        -> hand-edit broke it; fix or replace
+  E04  config missing apps/rooms section -> replace with known-good copy
+
+SCANNING
+  E10  scan failed for one app           -> bad detect config for that app only
+  E11  unattended (-Auto) did nothing    -> hostname unknown; deliberate - install by hand
+  E12  index build fell back to slow     -> cosmetic; log if constant
+  E13  fleet evidence conflict           -> two sticks disagree at same instant; rescan app on that machine
+
+INSTALL
+  E20  unknown install method            -> typo in apps.json
+  E21  installer source missing on drive -> incomplete USB copy; recopy folder
+  E22  installer failed to launch        -> path/permission issue; see log
+  E23  installer exited with failure code-> vendor code shown; retry once
+  E24  installed but not detected        -> click Refresh; check Start Menu
+  E25  winget install failed             -> winget source update; check internet
+  E26  MSI fatal 1603                    -> REBOOT + retry; then check AV/prior install
+  E27  offload copy failed (auto-fallback)-> installed from drive instead; ok
+  E28  not enough disk to offload        -> installed from drive instead; ok
+
+UNINSTALL
+  E40  no uninstall configured           -> use Programs & Features
+  E41  uninstall folder not found        -> already gone; Refresh
+  E42  no uninstaller in registry        -> manual removal (window opened)
+  E43  registry uninstall entry unusable -> manual removal (window opened)
+  E44  uninstaller failed to launch      -> manual removal; send log
+  E45  uninstaller exited with failure   -> retry once; then manual
+  E46  leftovers outside app folders     -> SAFETY refusal; verify path by hand
+  E47  vendor manager (e.g. NIPM) missing-> manual removal or install NIPM
+  E48  MSIX missing packageName          -> fix apps.json
+
+ENVIRONMENT (the machine, not the drive)
+  E60  admin rights required             -> relaunch via Launch.bat (UAC yes)
+  E61  winget not installed on this PC   -> MS Store "App Installer", or skip app
+  E62  another install already running   -> wait a few min / reboot (the 1618)
+  E73  RETIRED 2026-07-29 - no longer emitted. Was "this PC owes Windows a
+       reboot", which SKIPPED the install. Deleted: it was a guess (the real
+       Rockwell cause was our own detect path), it never caught anything, and
+       it blocked CCW on 3 machines in one afternoon because a fresh image
+       nearly always owes Windows Update a restart. Installs are no longer
+       blocked by a pending reboot; the state is just logged for context.
+  E74  stick fingerprint != staging      -> right after a sync! run Sync-Stick.ps1 (per-file check)
+  E63  disk full / write failure         -> (reserved) check free space
+  E64  winget bootstrap files missing    -> re-copy WingetBootstrap folder to drive
+  E65  winget install failed             -> send logs back / MS Store "App Installer"
+  E66  winget installed, not seen yet    -> log off + on, relaunch tool
+  E67  dependency app failed to install  -> install the required app manually, retry
+  E68  stick update failed (robocopy 8+)  -> re-plug stick, check space, rescan, retry
+
+INTERNAL
+  E70  unexpected internal error         -> send LabDeploy\logs\*.log back
+
+Log search: findstr "errorCode=E21" LabDeploy\logs\*.log

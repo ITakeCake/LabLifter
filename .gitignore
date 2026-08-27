@@ -1,0 +1,13 @@
+# Node / wrangler local state
+node_modules/
+.wrangler/
+
+# gui/ has its own .gitignore covering runtime state (licence codes, per-stick
+# identity, telemetry cursors) — see gui/.gitignore, the rules are documented there.
+
+# wrangler local-dev secrets (even dummy values stay out of the repo)
+.dev.vars
+
+# Local payload staging for demo/screenshots - installer binaries never enter the repo
+LabDeploy-InstallerSources/
+desktop.ini

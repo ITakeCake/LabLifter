@@ -1,0 +1,10 @@
+{
+  "_note": "TEMPLATE - copy to tokens.json and fill in real tokens. tokens.json is gitignored and NEVER committed; this example is committed so a fresh clone knows the file is required and what shape it takes.",
+  "_why": "The telemetry plane (Cloudflare) needs a per-client bearer token. Tokens are provisioned on the master: New-StickToken mints a random token, registers its HASH in the D1 'tokens' table via wrangler, and records the raw token HERE keyed by the client's drive-id GUID (drive-id.txt). The server only ever stores the hash, never the raw token.",
+  "_it_still_ships_to_sticks": "tokens.json is excluded from GIT, not from the stick mirror. It is in $script:MasterConfigFiles so Publish-ConfigToStaging copies it into the staging tree that sticks mirror from. Each stick reads ITS OWN token by matching $script:DriveId against the keys below.",
+  "_security": "Assume a token is recoverable by anyone holding a stick (sticks auto-unlock in use). That is why a token is LOW-POWER - it can only append and read observations, never delete, never touch config or payload. A misbehaving token is revoked server-side (tokens.enabled=0) and its stick_id added to the client revocation list; re-folding then cleans its observations.",
+  "_shape": "<drive-id-guid>: { token, label }. 'label' is human-readable (e.g. the LabDeploy-NN stick label, or 'Deployer' for the master). The running instance resolves its own token via $script:DriveId.",
+
+  "00000000-0000-0000-0000-000000000000": { "token": "REPLACE-WITH-REAL-TOKEN", "label": "Deployer (this master)" },
+  "11111111-1111-1111-1111-111111111111": { "token": "REPLACE-WITH-REAL-TOKEN", "label": "LabDeploy-07" }
+}

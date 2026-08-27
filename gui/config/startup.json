@@ -1,0 +1,4 @@
+{
+  "_note": "Startup toggles that ship to every stick as a MasterConfigFile (theFuture item 4). autoGpCm: if true, a field stick that cannot confirm from this machine's own logged history that GP update + CM actions have run in the current image generation will kick them off automatically at launch (non-blocking, background). Detection reads logs only and needs no admin; the actual gpupdate/CM run needs admin at runtime. Set false to disable the auto-run fleet-wide.",
+  "autoGpCm": true
+}

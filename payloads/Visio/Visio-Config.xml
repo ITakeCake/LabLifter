@@ -1,0 +1,91 @@
+<!--
+  Office Deployment Tool configuration - Microsoft Visio for ENG 5105.
+  Run as:  setup.exe /configure Visio-Config.xml
+
+  ============================ READ BEFORE FIRST USE ============================
+  THIS FILE IS A TEMPLATE WITH ONE UNVERIFIED FIELD: the Product ID below.
+  Everything else is mechanical; the SKU is a licensing fact only UNIV can
+  confirm. Get it wrong and setup.exe either fails outright or installs a Visio
+  nobody can activate.
+
+    VisioProRetail   - Visio Plan 2 assigned per user in Microsoft 365 (this is
+                       what the guide's link describes, so it is the default here)
+    VisioStdRetail   - Visio Plan 1 / Standard, subscription
+    VisioProXVolume  - Visio LTSC Professional, KMS-activated volume licence
+    VisioStdXVolume  - Visio LTSC Standard, KMS-activated volume licence
+
+  Campus almost certainly has ONE of the two volume SKUs if Visio is licensed
+  through the CSU agreement rather than per-student M365 assignment. Ask whoever
+  owns the Microsoft 365 tenant, then change ProductID below and delete this
+  paragraph.
+  ================================================================================
+
+  TWO THINGS THAT WILL BREAK THIS IF IGNORED
+
+  1. CHANNEL AND ARCHITECTURE MUST MATCH THE OFFICE ALREADY ON THE IMAGE.
+     Click-to-Run allows exactly one channel and one bitness per machine. If the
+     image ships Microsoft 365 Apps on Current Channel x64 (the normal case) then
+     this file must say Current and 64 - which it does. If the image is on
+     Monthly Enterprise or Semi-Annual, change Channel to match, or setup.exe
+     will refuse. Check with:
+         "C:\Program Files\Common Files\microsoft shared\ClickToRun\OfficeC2RClient.exe"
+     or read HKLM\SOFTWARE\Microsoft\Office\ClickToRun\Configuration ->
+     CDNBaseUrl / Platform / AudienceData.
+
+  2. SHARED COMPUTER ACTIVATION IS NOT OPTIONAL ON A LAB LAPTOP.
+     SharedComputerLicensing=1 below is what lets many different students sign in
+     to the same machine and each use their own Visio licence. Without it the
+     FIRST student to open Visio consumes one of their five device activations
+     and every later student is locked out. This setting only applies to the
+     subscription SKUs; it is harmless (ignored) on the volume ones.
+
+  WHAT THIS FILE DELIBERATELY DOES NOT DO
+     It does not list Microsoft 365 Apps / Office in <Add>, and it has no
+     <Remove> block. Listing only Visio ADDS Visio to whatever Click-to-Run
+     installation already exists and leaves Word/Excel/Outlook untouched. Adding
+     an Office product here would re-stage several GB and could change the
+     image's channel underneath the rest of the fleet.
+
+  OFFLINE VS ONLINE: with no local payload, setup.exe streams it from
+  Microsoft's CDN (~1-4 GB). To make it offline, run
+      setup.exe /download Visio-Config.xml
+  once on the bench FROM INSIDE this folder - that creates an Office\ subfolder
+  next to setup.exe. LEAVE SourcePath OUT of this file: in /configure mode with
+  SourcePath omitted, the ODT looks for that Office\ folder next to setup.exe
+  first and falls back to the CDN only when it is absent. That beats hardcoding
+  a path (stick drive letters vary) and beats a {source} placeholder (nothing
+  expands placeholders inside this XML - only the card's install.arguments).
+  Given that campus HTTPS interception already broke winget on this fleet (see
+  the PuTTY card), pre-downloading is the safer path for a 30-laptop cart.
+-->
+<Configuration ID="labdeploy-vep5105-visio">
+
+  <Add OfficeClientEdition="64" Channel="Current">
+    <Product ID="VisioProRetail">
+      <Language ID="en-us" />
+      <!-- Nothing to exclude: Visio is a single app. -->
+    </Product>
+  </Add>
+
+  <!-- No user interface, no EULA prompt, no reboot: this runs unattended
+       inside LabDeploy's install queue. -->
+  <Display Level="None" AcceptEULA="TRUE" />
+  <Property Name="AUTOACTIVATE" Value="0" />
+  <Property Name="FORCEAPPSHUTDOWN" Value="TRUE" />
+  <Property Name="SharedComputerLicensing" Value="1" />
+  <Property Name="DeviceBasedLicensing" Value="0" />
+
+  <!-- Keep Office updating the way the rest of the image does; do not let this
+       one product pin the machine to a different servicing cadence. -->
+  <Updates Enabled="TRUE" Channel="Current" />
+
+  <!-- setup.exe writes its own log here; LabDeploy's log points at it when the
+       install fails, which is the only way to tell a licensing refusal apart
+       from a download failure. -->
+  <Logging Level="Standard" Path="%TEMP%\LabDeploy-Visio" />
+
+  <!-- No RemoveMSI: these are freshly imaged machines with no legacy MSI Office.
+       If that ever changes, add <RemoveMSI /> here rather than uninstalling by
+       hand. -->
+
+</Configuration>

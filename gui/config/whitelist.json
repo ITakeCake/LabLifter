@@ -1,0 +1,6 @@
+{
+  "_note": "Users allowed to request fleet mark-edits from a stick (theFuture item 3). Master-authored; ships to every stick as a MasterConfigFile and is mirrored (read-only) to the Cloudflare dashboard via Push-MasterConfig so the Worker can approve requests. Match is case-insensitive against the Windows account ($env:USERNAME). Extend by adding names here and re-syncing sticks.",
+  "users": [
+    "Blake"
+  ]
+}

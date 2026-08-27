@@ -1,0 +1,13 @@
+{
+  "_note": "Hostname decoder tables. Hostname grammar: [building 2-3 digits][room 3-4 digits][TYPE letters][refresh digits]-[machine digits], e.g. 10101LAB1-05 = building 10 (MAIN), room 101, type LAB, refresh 1, machine 05. Low building codes ARE zero-padded in real hostnames. RULE: never add a building code that is a prefix of another (e.g. adding '9' would break a building '902') - the tool validates this on startup and warns. This file ships with ONE example building - fill these tables with YOUR campus and every building appears in the Rooms & Rules Designer automatically. Machines whose hostnames match nothing fall back to the DEFAULT room profile.",
+  "roomSizes": {
+    "_note": "\"<building>-<room>\": machine count. Optional - the Designer grows a room automatically from the highest machine number it has seen; a declared size just pins the ruler and the dashboard's expected count.",
+    "10-101": 24
+  },
+  "buildings": {
+    "10": { "abbr": "MAIN", "fullName": "Main Hall (example - replace with your campus)" }
+  },
+  "typeCodes": {
+    "LAB": { "machine01Role": "ask" }
+  }
+}

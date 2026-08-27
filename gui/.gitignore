@@ -1,0 +1,58 @@
+# Session logs (per-machine, regenerated every run) — includes logs copied off sticks
+logs/
+
+# Per-drive state, never shared between machines/sticks
+config/gui-settings.json
+drive-id.txt
+
+# Smoke-test scratch copy: tests\smoke.ps1 writes then deletes this itself; a
+# headless / aborted run (the elevated step can't complete) leaves it behind.
+_smoketest_temp.ps1
+
+# Vendor licence codes (2026-08-18). Real ADInstruments site-licence codes used
+# to sit inline in config/apps.json, so every commit published them. They now
+# live in licences.json, which ships to STICKS but never to git.
+# Bare filename = matched at any depth, which also covers the copies that
+# Save-NamedConfig writes into config/saved/<name>/.
+licences.json
+!config/licences.example.json
+
+# Saved master configurations are local state, not source. They are full copies of
+# every MasterConfigFile, so without this a saved config could re-introduce a
+# licence file under a different path.
+config/saved/
+
+# Working backups (*.bak-before-<something>) left by careful edits.
+*.bak-before-*
+
+# Telemetry push tokens (2026-08-18). Per-stick bearer tokens for the telemetry
+# plane. Same treatment as licences.json: ships to STICKS via the mirror, never
+# to git. Bare filename matches at any depth (covers config/saved/<name>/ copies).
+tokens.json
+!config/tokens.example.json
+
+# Per-drive telemetry push cursor (2026-08-18). Tracks which session logs this
+# drive has already pushed to Cloudflare. Per-drive like drive-id.txt: gitignored
+# AND excluded from the stick mirror (/XF), so a stick update never resets it.
+# Safe to delete anyway - re-push is idempotent (deterministic obs_id).
+telemetry-pushed.json
+
+# Per-drive mark-request pull cursor (2026-08-19, theFuture item 3). received_at
+# high-water mark of request-edits this master has pulled. Per-drive like the push
+# cursor; safe to delete (re-pull is idempotent via req_id UNIQUE).
+markreq-pulled.json
+
+# Per-drive HTTPS reachability record (2026-08-19). Whether THIS stick has reached
+# Cloudflare over HTTPS yet (attempts / successes / last error). Per-drive; safe to delete.
+telemetry-http.json
+
+# Runtime state written by the master GUI on every fleet refresh - on a dev
+# machine it fills with real fleet hostnames, so it must never be committed.
+config/fleet-issues.json
+
+# runtime backups written next to configs on every save - never source
+*.bak
+
+# Local assignment-ledger test data - the showcase ships WITHOUT one. An
+# adopter who wants their ledger versioned can delete this line.
+config/machine-assignments.json

@@ -1,0 +1,27 @@
+﻿{
+    "_note":  "Room profiles = named app sets. A machine gets a profile automatically when a deployment rule maps it to one (Rooms \u0026 Rules Designer), or a tech picks one from the dropdown. This file ships as a STARTER: the DEFAULT fallback plus one worked example. Add your own rooms here, or through the Designer + Build New Card.",
+    "rooms":  {
+                  "DEFAULT":  {
+                                  "displayName":  "Default (no room matched)",
+                                  "_note":  "The universal fallback set: auto-selected in the GUI when a machine\u0027s hostname matches no room profile or rule. Ships EMPTY - put cards here (Build New Card has a checkbox for it) if machines outside the naming scheme should still get a baseline. Unattended -Auto deliberately ignores this and stands down (E11): auto-installing onto unrecognised machines is how software lands on someone\u0027s personal laptop.",
+                                  "apps":  [
+
+                                           ]
+                              },
+                  "EXAMPLE-101":  {
+                                      "displayName":  "Example Lab (Building 10, Room 101)",
+                                      "_note":  "A worked example - rename it or delete it. Shape: displayName + apps (ARRAY ORDER IS INSTALL ORDER) + optional health block. Card ids must exist in apps.json.",
+                                      "health":  {
+                                                     "pki":  true,
+                                                     "checkImage":  true,
+                                                     "imageFile":  "auto",
+                                                     "_note":  "Per-room health chips. pki:false hides the PKI dot AND the PKI Check button for rooms whose machines never receive machine certificates (three dots become two). checkImage:false hides the Imaged dot. imageFile may be ANY file your imaging process lays down (a date inside the file wins, else the file timestamp), or the literal auto to read the Windows install date from the registry - which works on any machine with zero site-specific setup. Omit this whole block for the classic three-chip default. NOTE: the Rooms + Rules Designer saves the same three settings per PHYSICAL room into deployment-rules.json (roomHealth), and that - being resolved from the machine\u0027s own decoded hostname - wins over this profile-level block."
+                                                 },
+                                      "apps":  [
+                                                   "VLC",
+                                                   "Python",
+                                                   "VSCode"
+                                               ]
+                                  }
+              }
+}

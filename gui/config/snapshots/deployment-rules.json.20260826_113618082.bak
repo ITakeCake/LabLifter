@@ -1,0 +1,34 @@
+{
+  "_note": "Ordered, first match wins. The apps array order IS the install order. Edit on the Assign tab.",
+  "rules": [
+    {
+      "building": "55",
+      "rooms": "103",
+      "types": "",
+      "machines": "1-60",
+      "apps": [
+        "Logisim",
+        "ArduinoIDE",
+        "LTSpice",
+        "WaveForms",
+        "AnsysHFSS",
+        "PuTTY",
+        "Python",
+        "PythonPath",
+        "MSYS2",
+        "VSCode",
+        "VisualStudio",
+        "Vivado",
+        "STLinkDriver",
+        "Keil",
+        "AppLab",
+        "LabVIEW",
+        "RockwellCCW",
+        "Wireshark",
+        "MATLAB",
+        "MatlabArduino",
+        "MatlabLabDefaults"
+      ]
+    }
+  ]
+}
