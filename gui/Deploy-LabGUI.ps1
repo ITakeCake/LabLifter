@@ -105,7 +105,7 @@ try {
 }
 
 # deployment-rules.json (OPTIONAL): machine-coordinates -> package-set rules.
-# Blake's year-to-year knob: building + room(s/ranges) + type(s) + machine
+# the year-to-year knob: building + room(s/ranges) + type(s) + machine
 # number range -> room profile. First matching rule wins. Missing/broken file
 # just means "no rules" - the older room-profile matching still applies.
 $script:RulesConfig = $null
@@ -129,7 +129,7 @@ $script:OffloadEnabled = $true  # big images: stage to local disk before install
 # casing needed for either.
 $script:UiScale = 1.0
 $script:UiScaleSteps = @(0.75, 0.9, 1.0, 1.1, 1.25, 1.5, 1.75, 2.0)
-# Fit-to-window (Blake, 2026-07-30): the fixed % steps above are a preference,
+# Fit-to-window (2026-07-30): the fixed % steps above are a preference,
 # this is a MODE. On, the UI re-scales itself every time the window is dragged
 # to a new size, so a narrow window shows the same layout smaller instead of
 # the same layout clipped behind scrollbars. DEFAULT ON - the old behaviour is
@@ -138,7 +138,7 @@ $script:UiFit = $true
 $script:UiFitBase = $null    # window size the first time we saw it = our 100%
 $script:UiFitApplied = $null # last scale actually pushed, so drags no-op cheaply
 # Deployment Tracker: hide machines whose hostname never decoded to a building
-# and room. DEFAULT ON (Blake, 2026-07-30) - a stick plugged into a laptop, a
+# and room. DEFAULT ON (2026-07-30) - a stick plugged into a laptop, a
 # spare, or a renamed machine lands in "Unrecognized names" and is noise on a
 # map about lab rooms. Hiding is DISPLAY ONLY: their logs still merge, they
 # still fold into the rollup, and Publish-FleetIssues still sends their recheck
@@ -380,7 +380,7 @@ Write-LabLog -Event 'app.start' -Data @{
 # machine-and-time only, never people (it's still shown live in the header for
 # the tech's own context, but never written to the logs/master store).
 
-# ---- UNIV MATLAB customization status harvest (Blake, 2026-08-12) ----
+# ---- UNIV MATLAB customization status harvest (2026-08-12) ----
 # univ_lab_defaults.m and sl_customization.m write a per-run status report ON
 # THE MACHINE (%USERPROFILE%\MATLAB\univ-*-status.txt), because MATLAB usually
 # starts when no stick is anywhere near it. Whenever the GUI runs on that
@@ -478,7 +478,7 @@ function Sync-DebugToMaster {
 }
 
 # ============================================================
-#  Vendor installer logs  (Blake, 2026-08-03)
+#  Vendor installer logs (2026-08-03)
 # ============================================================
 # Measured 2026-08-03: the master store held 222 MB, of which 221 MB was vendor
 # installer debris (270 vs-*.log files). Get-FleetRollup only ever reads
@@ -579,8 +579,8 @@ $null = Sync-DebugToMaster
 # Adder tabs land here in later phases (see ROADMAP.md).
 $script:IsMaster            = Test-Path $script:MasterRoot
 $script:MasterConfigFile = Join-Path $script:MasterRoot 'master-config.json'
-$script:StickOps         = @{}      # letter -> live op @{Proc;Started;Letter}. PARALLEL since 2026-07-29 (Blake): was a single slot.
-$script:StickMaxParallel = 4        # how many robocopy mirrors may run at once. Blake asked for 4. Each mirror is its OWN robocopy PROCESS, so this is real concurrency without runspaces - the UI only polls them. Raising this past the number of physical USB controllers buys nothing: sticks on one master share bandwidth, so 4 drives on one master finish in roughly the time 4 serial copies would. Set to 1 to get the old serial behaviour back.
+$script:StickOps         = @{}      # letter -> live op @{Proc;Started;Letter}. PARALLEL since 2026-07-29: was a single slot.
+$script:StickMaxParallel = 4        # how many robocopy mirrors may run at once. four by design. Each mirror is its OWN robocopy PROCESS, so this is real concurrency without runspaces - the UI only polls them. Raising this past the number of physical USB controllers buys nothing: sticks on one master share bandwidth, so 4 drives on one master finish in roughly the time 4 serial copies would. Set to 1 to get the old serial behaviour back.
 $script:StickQueue       = New-Object System.Collections.Queue   # sticks waiting for a free slot; drained by Start-StickQueueDrain
 $script:StickBatch       = @{ Ok = @(); Fail = @() }              # results across one burst, for the final summary line
 $script:StickRows        = @{}      # letter -> this row's live controls (Bar/Status/Btn) - rebuilt on every rescan, painted by the queue
@@ -989,7 +989,7 @@ function Get-StickVerdict {
     if ($m -eq $StagingSig) {
         return @{ State = 'CURRENT'; Text = "CURRENT - matches staging (synced $($Entry.lastSynced))" }
     }
-    # Blake's red-flag case: it was PLUGGED IN after its last sync and left
+    # the red-flag case: it was PLUGGED IN after its last sync and left
     # stale anyway - someone forgot to click Update.
     $extra = ''
     try {
@@ -1180,7 +1180,7 @@ function Get-StickScopePlan {
 function Start-StickMirror {
     # Async robocopy mirror of <staging>\LabDeployment -> <X>:\LabDeployment.
     # NEVER touches the drive root (/MIR is scoped to the LabDeployment subtree;
-    # root files like Blake's inbox notes are invisible to it). Field data is
+    # root files like the inbox notes are invisible to it). Field data is
     # protected: the stick's logs dir, gui-settings.json, drive-id.txt and
     # timestamp_Cart.txt are excluded from both copy AND deletion.
     param(
@@ -1205,7 +1205,7 @@ function Start-StickMirror {
         # Copying everything instead would be worse than stopping: it silently
         # ignores the scope the tech chose and can overfill a small stick.
         & $OnDone @{ Ok = $false; Letter = $Letter
-            Msg = ("[E74] {0}: this scope needs {1} folder exclusions ({2} characters), past what a single robocopy command can carry. Widen the scope, or tell Blake - the payload folders need regrouping." -f $Letter, $plan.ExcludeCount, $plan.ArgChars) }
+            Msg = ("[E74] {0}: this scope needs {1} folder exclusions ({2} characters), past what a single robocopy command can carry. Widen the scope, or tell your LabLifter admin - the payload folders need regrouping." -f $Letter, $plan.ExcludeCount, $plan.ArgChars) }
         return
     }
     if ($plan.Scoped) {
@@ -1218,7 +1218,7 @@ function Start-StickMirror {
     # SCOPE-SWITCH PURGE. robocopy /XD excludes a directory from BOTH the copy AND
     # the /MIR purge, so an out-of-scope folder ALREADY on the stick (left by a
     # PRIOR, different scope) is neither copied nor deleted - it just stays. When a
-    # stick is re-scoped to a DIFFERENT set (Blake's first ENG->Science switch,
+    # stick is re-scoped to a DIFFERENT set (the first ENG->Science switch,
     # slot 17, 2026-08-19), the old ENG payload therefore piled on top of the new
     # Science payload and overflowed the drive: F: hit 100% full, robocopy exit 9,
     # and the stick never got all the Science software. /XD alone can NARROW a
@@ -1267,7 +1267,7 @@ function Start-StickMirror {
             $vol = Get-Volume -DriveLetter $Letter -ErrorAction Stop
             $freeB = [int64]$vol.SizeRemaining
             $isFresh = -not (Test-Path $dstLD)
-            # THE FIRST-CLICK HITCH LIVED HERE (fixed 2026-07-29, Blake: "the first
+            # THE FIRST-CLICK HITCH LIVED HERE (fixed 2026-07-29: "the first
             # time I click update stick the whole UI freezes for a second").
             # Measuring staging means a recursive walk of ~47k files / ~55 GB of
             # metadata on the UI THREAD - unavoidably a visible freeze, and it ran
@@ -1427,7 +1427,7 @@ function Set-StickStatus {
     param([string]$Text)
     if ($script:MW.txtStickStatus) { try {
         $script:MW.txtStickStatus.Text = $Text
-        # Status Dock band (Blake, 2026-07-31): the fleet rollup's stale count
+        # Status Dock band (2026-07-31): the fleet rollup's stale count
         # surfaces amber ("... 12 STALE ..."); every other message stays muted.
         $script:MW.txtStickStatus.Foreground = if ($Text -match '\b[1-9]\d* STALE\b') { $script:BrushDotWarn } else { $script:BrushStickMuted }
     } catch { } }
@@ -2444,7 +2444,7 @@ function Update-StickList {
     # drive you must never re-initialize. Pull those out and name them instead.
     $lockedDrives = @($cands | Where-Object { $_.Locked })
     $fresh  = @($cands | Where-Object { -not ($_.HasMarker -and $_.DriveId) -and -not $_.Locked })
-    # LABEL MIGRATION (Blake, 2026-07-29): LABDEPLOYXX -> LabDeploy-XX. The
+    # LABEL MIGRATION (2026-07-29): LABDEPLOYXX -> LabDeploy-XX. The
     # fleet's sticks are NTFS by our own init pipeline (mixed case + 32-char
     # labels fine; 11 chars was FAT-era caution). Relabeling touches no files
     # and no drive-id - identity is the GUID. Doing it on rescan means any
@@ -2530,7 +2530,7 @@ function Update-StickList {
                                     Verdict = (Get-StickVerdict -Entry $e -StagingSig (Get-ScopedStagingSigForLabel -Label "$($e.label)")) }
     }
     # The away sticks are NOT rendered as their own text rows any more (removed
-    # 2026-08-26, Blake: redundant - the slot ledger above already shows every
+    # 2026-08-26: redundant - the slot ledger above already shows every
     # known stick, plugged in or not). $away still feeds the footer tally.
     # Footer: the fleet-wide answer to "which sticks need syncing?" in one line.
     $vAll = @($script:StickVerdicts.Values) + @($away | ForEach-Object { $_.Verdict })
@@ -2644,7 +2644,7 @@ function Complete-StickVerify {
     $stampSig = Set-StickSyncStamp -Letter $r.Letter -PrecomputedManifest $MSig
     $doneText = ("updated OK at {0} - {1} file(s) copied, {2} stale removed" -f (Get-Date).ToString('HH:mm'), $r.FilesCopied, $r.FilesExtra)
     $rowOk = $true
-    # TRIPWIRE (Blake, 2026-07-29): metadata must match the event that just
+    # TRIPWIRE (2026-07-29): metadata must match the event that just
     # happened. Immediately after a successful mirror the stick's fingerprint
     # MUST equal staging's - if it doesn't, either the copy silently dropped
     # something (the LABDEPLOY01 class) or the fingerprint math drifted.
@@ -2763,14 +2763,14 @@ function Start-QueuedStickUpdate {
     }
 }
 
-# "Update ALL Known Sticks" (Blake, 2026-07-29). Queues every stick currently
+# "Update ALL Known Sticks" (2026-07-29). Queues every stick currently
 # listed, which is by construction only KNOWN sticks: a drive lands in
 # $script:StickRows only when it carries the LabDeployment marker AND a
 # drive-id.txt (Add-StickLedgerToPanel registers ledger rows for live sticks;
 # New-StickRow registers fallback rows when the ledger cannot render).
 # Brand-new/blank drives are never in there - they land in the Initialize combo
 # instead, behind its type-the-letter guard. So this button can never mirror
-# onto an unrecognised drive, which is exactly Blake's rule that warnings are
+# onto an unrecognised drive, which is exactly the design rule that warnings are
 # for fresh drives only.
 function Invoke-StickUpdateAll {
     if (-not $script:StickRows -or $script:StickRows.Count -eq 0) {
@@ -2806,7 +2806,7 @@ function Invoke-StickUpdateAll {
         delete most of it again - slow, and pointless wear on the drive
       * worse, Start-StickMirror's free-space guard demands room for the FULL
         staging tree on a fresh stick, so initializing a 16 GB drive is refused
-        outright. Blake's whole reason for wanting this feature was small
+        outright. the whole reason for wanting this feature was small
         room-specific sticks, which were impossible until scope came first.
 
     Returns @{ Ok; Slot; Label; Scope } or @{ Ok = $false } if cancelled.
@@ -3233,7 +3233,7 @@ function Invoke-StickInitFlow {
     } catch {
         Write-LabLog -Event 'stick.init_picker_error' -Data @{ letter = $selLetter; error = "$($_.Exception.Message)" }
         [System.Windows.MessageBox]::Show(
-            "The room/program picker failed to open:`n`n$($_.Exception.Message)`n`nNothing has been written to the drive. Tell Blake - the details are in this session's log.",
+            "The room/program picker failed to open:`n`n$($_.Exception.Message)`n`nNothing has been written to the drive. Tell your LabLifter admin - the details are in this session's log.",
             'Could not open the picker', 'OK', 'Warning') | Out-Null
         Set-StickStatus "[E72] ${selLetter}: scope picker failed - $($_.Exception.Message)"
         return
@@ -3357,7 +3357,7 @@ function Invoke-StickInitFlow {
 $script:MasterConfigFiles = @('rooms.json', 'buildings.json', 'deployment-rules.json', 'apps.json', 'licences.json', 'tokens.json', 'telemetry.json', 'whitelist.json', 'startup.json')
 
 # ============================================================
-#  Vendor licence codes  (Blake, 2026-08-18)
+#  Vendor licence codes (2026-08-18)
 # ============================================================
 # Real ADInstruments site-licence codes used to sit inline in apps.json - in
 # LtLabStation's msiexec arguments and in LabChart's registration.byRoom block.
@@ -3426,7 +3426,7 @@ function Get-LicenceMissingMessage {
 }
 
 # ============================================================
-#  TELEMETRY PLANE - client push  (Blake, 2026-08-18)
+#  TELEMETRY PLANE - client push (2026-08-18)
 # ============================================================
 # Push-only in Phase 0. Re-encodes session logs into observation rows and POSTs
 # them to Cloudflare, so the fleet is visible without being at this desk and
@@ -3882,7 +3882,7 @@ function Invoke-RoomsPost {
 
 function Get-ConfiguredRooms {
     # Every room the master has a config for, as @{ Building; Room; Abbr } - so the
-    # dashboard/GUI can show rooms NEVER touched by a stick (Blake: "I should see
+    # dashboard/GUI can show rooms NEVER touched by a stick ("I should see
     # rooms that have never been touched"). Only profiles that name explicit room
     # numbers are emitted; building-wide / catch-all profiles (ENG, ALL-SCI) are
     # skipped because we can't invent their room numbers.
@@ -4069,7 +4069,7 @@ function Import-Whitelist {
             $p = $raw.PSObject.Properties['users']
             if ($p) { foreach ($u in @($p.Value)) { if ("$u".Trim()) { $users += "$u".Trim() } } }
         } elseif ($script:IsMaster) {
-            $seed = "$($env:USERNAME)".Trim(); if (-not $seed) { $seed = 'Blake' }
+            $seed = "$($env:USERNAME)".Trim(); if (-not $seed) { $seed = 'admin' }
             $users = @($seed)
             $obj = [pscustomobject]@{ _note = 'Users allowed to request fleet mark-edits from a stick. Master-authored; ships to sticks.'; users = $users }
             try { $obj | ConvertTo-Json -Depth 4 | Set-Content $script:WhitelistFile -Encoding UTF8 } catch {}
@@ -4130,7 +4130,7 @@ function Test-MachineNeedsGpCm {
         else { foreach ($k in @($roll.Keys)) { if ("$k".Trim().ToLower() -eq "$Machine".Trim().ToLower()) { $rec = $roll[$k]; break } } }
         if ($rec) {
             $out.GpLast = $rec.GpLast; $out.CmLast = $rec.CmLast; $out.Sessions = [int]$rec.Sessions
-            # "ran at all in this generation" = confirmed (Blake's wording is "have they
+            # "ran at all in this generation" = confirmed (the wording is "have they
             # RAN yet", not "did they succeed"). A recorded-but-failed run still counts as
             # ran, so a persistent failure doesn't re-fire gpupdate every single launch.
             # An AUTO launch (GpTried/CmTried) also counts - otherwise the auto path, which
@@ -5140,7 +5140,7 @@ function Add-ProgramsRecord {
     # a blank token matches every machine, so a plain append would leave the new
     # rule shadowed and these machines would silently keep the blank rule's list
     # instead of the one just chosen. A blank-token rule of our own still
-    # appends - it IS the catch-all. (Blake, 2026-07-31)
+    # appends - it IS the catch-all. (2026-07-31)
     $script:RulesConfig.rules = @(if ($token) { Add-RoomRuleOrdered -Rules $prev -NewRule $new -Building $Building -Room $Room }
                                   else { @($prev + $new) })
     if (-not (Save-RulesConfig)) {
@@ -5152,7 +5152,7 @@ function Add-ProgramsRecord {
 }
 
 # ============================================================
-#  Segment surgery  (Blake, 2026-07-31)
+#  Segment surgery (2026-07-31)
 # ============================================================
 # Split / Merge / Remove / Room Size: the last four things the Assign tab could
 # do that the Layout Designer could not. Same record-layer contract as the
@@ -5178,7 +5178,7 @@ function Add-ProgramsRecord {
 # gives them. Inserting immediately BEFORE the room's first blank-token rule
 # fixes that and disturbs nothing else, because the blank rule only ever
 # claimed what no bounded rule had taken. With no blank rule present this is
-# an ordinary append. (Blake, 2026-07-31)
+# an ordinary append. (2026-07-31)
 function Add-RoomRuleOrdered {
     param($Rules, $NewRule, [string]$Building, [string]$Room)
     $list = New-Object System.Collections.ArrayList
@@ -5498,7 +5498,7 @@ function Remove-ProgramsRecord {
 # Merge is only safe when nothing ELSE in the room claims part of the combined
 # range: widening a rule over a span some other rule already wins would move
 # machines nobody asked to move. Rather than guess, this refuses and names the
-# rule in the way - Blake's standing preference for surfacing conflicts in
+# rule in the way - the standing preference for surfacing conflicts in
 # words rather than picking a silent winner.
 function Test-SegmentMerge {
     param([string]$Building, [string]$Room, $Segment, $Next)
@@ -6174,7 +6174,7 @@ function Complete-Capture {
     if ($ver) { $card.versionLabel = $ver }
     if ($script:MW.chkCapOpen.IsChecked) {
         $card.needsOpen = $true
-        # Blake specified these as SEPARATE settings: open-after-install, and
+        # these are SEPARATE settings by design: open-after-install, and
         # (only if so) whether a popup asks the tech to confirm. askAfterOpen
         # false = just launch it, no question, card goes green normally.
         $card.askAfterOpen = [bool]$script:MW.chkCapAsk.IsChecked
@@ -6226,7 +6226,7 @@ function Complete-Capture {
 #  Fleet Map  (Master Mode, Phase 2)
 # ============================================================
 # Rollup of every session log in C:\LabDeployMaster\logs into per-machine
-# records, presented per Blake's spec: room cards -> machines in number order
+# records, presented per the design spec: room cards -> machines in number order
 # (gaps grey) -> expected-vs-installed coloring -> per-machine drill-down.
 function Get-FleetRollup {
     # Three rules, in precedence order (all field-driven, 2026-07-29):
@@ -6253,7 +6253,7 @@ function Get-FleetRollup {
     $masterLogs = if ($LogsDir) { $LogsDir } else { Join-Path $script:MasterRoot 'logs' }
     if (-not (Test-Path $masterLogs)) { return $roll }
 
-    # RECONCILIATION CORE (Blake's spec, 2026-07-30). Every piece of per-app
+    # RECONCILIATION CORE (the design spec, 2026-07-30). Every piece of per-app
     # evidence keeps WHEN (ms precision), WHICH stick, WHICH session, and its
     # file order (Seq). The rules, in order:
     #   1. NEWEST WINS, regardless of which stick said it. Error 1:00pm, fixed
@@ -6442,7 +6442,7 @@ function Get-FleetRollup {
                     $opened[$Matches[1]] = $ts
                 }
                 elseif ($line -match 'event=gp\.update_done') {
-                    # Blake wants "have GP updates been run?" on the map. Latest
+                    # the requirement: "have GP updates been run?" on the map. Latest
                     # run in the current generation wins; OK = both scopes passed.
                     if (-not $r.GpLast -or $ts -ge $r.GpLast) {
                         $r.GpLast = $ts
@@ -6533,7 +6533,7 @@ function Get-FleetRollup {
     # machine.decoded log event, but any log written before the decoder existed
     # (2026-07-26) - or by a stick still carrying an older script - has no such
     # line, so those machines stayed room-less and fell outside every room card
-    # on the Fleet Map. Proven with Blake's real field stick: 18 logs from
+    # on the Fleet Map. Proven with a real field stick: 18 logs from
     # 10101LAB34-80/-87 dated 07/14-07/23 all landed unroomed. The hostname is
     # in the filename, so decode it directly when the log did not supply one.
     foreach ($key in @($roll.Keys)) {
@@ -6589,7 +6589,7 @@ function Get-FleetExpected {
 }
 
 # Some cards must never colour the fleet map. MatlabLabDefaults is the case
-# that forced this (Blake, 2026-08-18): it is a per-user MATLAB preference
+# that forced this (2026-08-18): it is a per-user MATLAB preference
 # refresh, so a machine that has not had it re-applied is not a broken machine -
 # but 19 ENG boxes were showing YELLOW purely because of it, which buries the
 # machines that genuinely need attention.
@@ -6606,12 +6606,12 @@ function Test-AppCountsForFleetHealth {
 }
 
 function Get-FleetMachineStatus {
-    # Blake's rules (2026-08-19): YELLOW if any counted program is missing (a
+    # the design rules (2026-08-19): YELLOW if any counted program is missing (a
     # failed install counts as missing); GREEN if all programs present AND GP+CM
     # both ran; PURPLE if all programs present but GP/CM not run. Red/orange
     # (untouched) and grey/blue are decided by the caller (Get-RoomTally).
     # Separately,
-    # Blake wants to spot at a glance "this machine never had anyone click the
+    # the goal is to spot at a glance "this machine never had anyone click the
     # I-opened-the-app checkboxes", so unconfirmed needs-open apps are appended
     # to the row TEXT without changing the colour semantics.
     param($Rec, $Expected)
@@ -6688,18 +6688,18 @@ $script:FleetColors = @{
     red    = [System.Windows.Media.SolidColorBrush]::new([System.Windows.Media.Color]::FromRgb(0x6E,0x1E,0x1E))
     grey   = [System.Windows.Media.SolidColorBrush]::new([System.Windows.Media.Color]::FromRgb(0x3A,0x3A,0x40))
     card   = [System.Windows.Media.SolidColorBrush]::new([System.Windows.Media.Color]::FromRgb(0x2D,0x2D,0x33))
-    # "Reported missing" (Blake, 2026-08-03): the structural sibling of the
+    # "Reported missing" (2026-08-03): the structural sibling of the
     # three status fills - same dark family, unmistakably blue. Deliberately
     # NOT #2E4EED (accent = interactive), NOT #0078D4 (Refresh), NOT #1F4A6E
     # (Shortcut button), so a missing tile can never read as clickable chrome.
     blue   = [System.Windows.Media.SolidColorBrush]::new([System.Windows.Media.Color]::FromRgb(0x1E,0x3A,0x6E))
-    # New health states (Blake, 2026-08-19). purple = has the programs but GP/CM
+    # New health states (2026-08-19). purple = has the programs but GP/CM
     # not run yet; orange = untouched and only owes GP/CM (no program cards).
     purple = [System.Windows.Media.SolidColorBrush]::new([System.Windows.Media.Color]::FromRgb(0x4A,0x2E,0x6E))
     orange = [System.Windows.Media.SolidColorBrush]::new([System.Windows.Media.Color]::FromRgb(0x7A,0x3C,0x0A))
 }
-# PC-tile fills match the LabBoard dashboard's wall palette EXACTLY (Blake,
-# 2026-08-26): a machine that is green on the wall is the SAME green here, so
+# PC-tile fills match the LabBoard dashboard's wall palette EXACTLY (2026-08-26
+# ): a machine that is green on the wall is the SAME green here, so
 # nobody has to translate between the two views. ONLY the machine tiles, their
 # room tally chips, the never-seen stub and the room progress fill use these -
 # row backgrounds and other chrome keep the darker FleetColors family above.
@@ -6714,7 +6714,7 @@ $script:TileColors = @{
 }
 
 # ============================================================
-#  Tech marks  (Blake, 2026-08-03)
+#  Tech marks (2026-08-03)
 # ============================================================
 # A human assertion about a machine, as opposed to a machine report. Three:
 #   verified  "Mark as Verified" - counts Healthy NOW, but any newer report
@@ -6724,7 +6724,7 @@ $script:TileColors = @{
 #   missing   "Report Missing"   - the box is physically gone. Leaves the
 #             percentage denominator entirely and turns blue.
 #
-# IDENTITY (Blake's rule): a machine is (hostname, image date), so a mark keys
+# IDENTITY (the design rule): a machine is (hostname, image date), so a mark keys
 # on "$hostname|$imagedGen". Reimage the box and the mark does NOT follow -
 # that is a different machine. A machine no stick has ever seen has neither a
 # hostname nor a generation, so it keys on "room:$RoomKey|$Num" instead; the
@@ -6884,9 +6884,9 @@ function Remove-FleetMarkRecord {
 }
 
 # ============================================================
-#  Year pages  (Blake, 2026-08-03)
+#  Year pages (2026-08-03)
 # ============================================================
-# Blake's rule: "10101lats34-27 with timestamp created on X is a completely
+# the design rule: "10101lats34-27 with timestamp created on X is a completely
 # different machine from 10101lats34-27 with timestamp Y." So a page is not a
 # date filter over EVIDENCE - it is a partition over MACHINE GENERATIONS by
 # their image date. A 2025-imaged box touched by a stick in 2030 is still a
@@ -6894,7 +6894,7 @@ function Remove-FleetMarkRecord {
 #   * old pages freeze by physics - a dead generation gathers no new evidence
 #   * reimaging a box creates a NEW machine on the new page; its ancestor stays
 #   * a replacement PC under a recycled hostname is naturally a different
-#     machine, which is the real-world case Blake called out
+#     machine, which is the real-world case this was built for
 #   * marks key on hostname|imageStamp, so a 2026 flag cannot leak onto its
 #     2027 successor
 # Pages are stored as CUTOFFS: a generation belongs to the page with the
@@ -7077,7 +7077,7 @@ function Restore-FleetYearRecord {
 }
 
 # ============================================================
-#  Watermarks - "Forget This Machine"  (Blake, 2026-08-03)
+#  Watermarks - "Forget This Machine" (2026-08-03)
 # ============================================================
 # "Ignore everything this machine reported before time T." Nothing is deleted:
 # the session logs stay exactly where they are, the fold just stops counting
@@ -7141,7 +7141,7 @@ function Invoke-FleetForgetFlow {
     Set-StickStatus $r.Msg
 }
 
-# AUTO-FOUND (Blake, 2026-08-03): a machine reported missing clears itself the
+# AUTO-FOUND (2026-08-03): a machine reported missing clears itself the
 # moment evidence stamped AFTER the flag arrives. Only newer evidence counts -
 # a stale stick replaying pre-flag sessions cannot resurrect a machine, which
 # is the existing newest-wins rule doing the work. Runs once per rollup and
@@ -7162,7 +7162,7 @@ function Update-FleetAutoFound {
             # IDENTITY GUARD: a mark belongs to ONE machine-generation. Without
             # this, a replacement PC reporting under a recycled hostname would
             # clear the flag on the box it replaced - two different machines,
-            # per Blake's rule. A "|pending" flag is the deliberate exception:
+            # per the design rule. A "|pending" flag is the deliberate exception:
             # it was carried across a rollover precisely to bind to whatever
             # generation turns up next.
             if ($cand -and ($gen0 -eq 'pending' -or "$($cand.ImagedGen)" -eq $gen0 -or
@@ -7191,7 +7191,7 @@ function Update-FleetAutoFound {
 # the progress bar, the sub-line and the fleet title, so the four can never
 # disagree. Phase 3 (tech marks) extends THIS function - a machine marked
 # missing flips its State to 'blue' here and every consumer follows.
-# Percent formula (Blake, 2026-08-03): ok / (machines - missing). Never-touched
+# Percent formula (2026-08-03): ok / (machines - missing). Never-touched
 # still counts against - "done" means done - but a machine reported missing is
 # not work, so it leaves the denominator entirely.
 function Get-RoomTally {
@@ -7334,7 +7334,7 @@ function Get-FleetRoomGroups {
         } else { [void]$g.Unnumbered.Add($r) }
     }
     # Rooms the master has a config for but no stick has ever touched still belong on the
-    # map (Blake: "I should see rooms that have never been touched"). Add them as empty
+    # map ("I should see rooms that have never been touched"). Add them as empty
     # groups so Get-RoomTally paints red/orange boxes for their expected slots.
     try {
         foreach ($cr in Get-ConfiguredRooms) {
@@ -7362,7 +7362,7 @@ function Get-FleetRoomOrder {
 # list. A 90-machine room now reads as six rows of colour instead of ninety
 # stacked sentences. Clicking fills the inspector panel - no MessageBox.
 # ============================================================
-#  Tile selection  (Blake, 2026-08-03)
+#  Tile selection (2026-08-03)
 # ============================================================
 # Multi-select so a tech can act on many machines at once:
 #   plain click       select ONE machine (and open its inspector); it becomes
@@ -7449,7 +7449,7 @@ function Invoke-FleetTileClick {
     Show-FleetMachineInspector -Ctx $Ctx
 }
 
-# Professional hover language (Blake, 2026-08-03), borrowed from Azure health
+# Professional hover language (2026-08-03), borrowed from Azure health
 # states + Windows Security: Healthy / Needs attention / Critical / Not checked
 # / Missing. Line 1 is the state in words, line 2 the machine and when it last
 # reported - colour is never the only channel.
@@ -7499,7 +7499,7 @@ function New-FleetTile {
     # predate the tally (none remain in-repo) would pass -Rec/-Expected alone
     # and get them recomputed.
     #
-    # BORDER, NOT BUTTON (Blake, 2026-08-03). Selection needs a ring, and
+    # BORDER, NOT BUTTON (2026-08-03). Selection needs a ring, and
     # SmallBtn's ControlTemplate only TemplateBinds Background and Padding - a
     # BorderBrush set on a Button styled with it is silently dropped. That is
     # the same trap CardBtn sprang on the Layout Designer's selected card,
@@ -7579,7 +7579,7 @@ function New-FleetTile {
 # Does this machine match the active filter? Search matches the hostname OR an
 # expected-but-MISSING app id, which is the "show me every machine missing
 # LabVIEW" pivot - the question the old room-by-room list could not answer.
-# The "needs attention only" tickbox was removed 2026-07-30 (Blake: "kinda
+# The "needs attention only" tickbox was removed 2026-07-30 ("kinda
 # useless") - the % done and the per-room tally already say where the work is,
 # and the search box does the useful half of what the filter did.
 function Test-FleetMatch {
@@ -7770,7 +7770,7 @@ function Update-FleetRooms {
         # opened today catches only machines imaged from today on, so it is
         # empty until the first stick reports - which looked exactly like the
         # Start New Year button having done nothing at all. Name the year, the
-        # cutoff, and where the old machines went. (Blake, 2026-08-03)
+        # cutoff, and where the old machines went. (2026-08-03)
         $msg = if ($query) { "Nothing matches '$query'. Clear the search box to see the whole fleet." }
                elseif ($hiddenUnknown -gt 0) { "The only $hiddenUnknown machine(s) on record have hostnames that don't decode to a room. Untick 'Hide machines with unrecognised names' in Settings to see them." }
                else {
@@ -7799,7 +7799,7 @@ function Update-FleetRooms {
     }
 
     if ($script:MW.txtFleetTitle) {
-        # Lead with the number Blake actually wants: how much of the fleet is
+        # Lead with the number a tech actually wants: how much of the fleet is
         # done. Missing machines leave the denominator (they are not work), and
         # are stated rather than silent, like the hidden count.
         $counted = $totMach - $totMissing
@@ -8008,7 +8008,7 @@ function Invoke-FleetMarkRequestFlow {
     $user = "$($env:USERNAME)".Trim()
     if (-not (Test-UserWhitelisted $user)) {
         [System.Windows.MessageBox]::Show(
-            "$user is not on the approved list for dashboard edits, so this request was not sent.`n`nAsk Blake to add this account to whitelist.json and re-sync.",
+            "$user is not on the approved list for dashboard edits, so this request was not sent.`n`nAsk your LabLifter admin to add this account to whitelist.json and re-sync.",
             'Request dashboard edit', [System.Windows.MessageBoxButton]::OK, [System.Windows.MessageBoxImage]::Information) | Out-Null
         return
     }
@@ -8143,7 +8143,7 @@ function Show-FleetYearMenu {
     $pop.IsOpen = $true
 }
 
-# Cutoff validation, split out so the dialog and the tests agree. Blake's spec:
+# Cutoff validation, split out so the dialog and the tests agree. the design spec:
 # the box only accepts sane years, so a typo cannot open a 2029 page - but the
 # CLOSING year is legal too, because imaging for next September routinely
 # happens in December. The auto-today path deliberately skips this (below).
@@ -8219,7 +8219,7 @@ function Invoke-FleetNewYearFlow {
     # Ask BEFORE building a new page if there is a deleted one sitting in the
     # bin. Starting a fresh year when what you meant was "put back the one I
     # deleted five minutes ago" leaves two pages to clean up, and the tech has
-    # no way to know the bin exists unless something says so. (Blake, 2026-08-03)
+    # no way to know the bin exists unless something says so. (2026-08-03)
     $bin = @(Get-FleetRestorableYears)
     if ($bin.Count) {
         $what = $(if ($bin.Count -eq 1) { "the $(Get-FleetRestoreLabel -Rec $bin[0]) page" }
@@ -8236,7 +8236,7 @@ function Invoke-FleetNewYearFlow {
     if ($ans -eq [System.Windows.MessageBoxResult]::Cancel) { return }
     $cut = $null
     if ($ans -eq [System.Windows.MessageBoxResult]::Yes) {
-        # Deliberately NOT validated (Blake, 2026-08-03): the automatic
+        # Deliberately NOT validated (2026-08-03): the automatic
         # today-path has to work while the bench clock says whatever it says,
         # so a debug machine can exercise year rollover. Do not "fix" this.
         $cut = $today
@@ -8531,7 +8531,7 @@ function Export-FleetCsv {
 }
 
 # ============================================================
-#  Fleet snapshot as a web page  (Blake, 2026-08-18)
+#  Fleet snapshot as a web page (2026-08-18)
 # ============================================================
 # A read-only copy of the Deployment Tracker that can live somewhere other
 # than this desk. ONE-WAY BY CONSTRUCTION: this writes a file and returns.
@@ -8926,7 +8926,7 @@ function Load-AssignRoom {
     $script:AS.Type     = "$($Entry.Type)"
     $script:AS.Complex  = $false
     $script:AS.SplitMode = $false
-    # NO DATABASE OF ROOM SIZES (Blake, 2026-07-30): the school tracks machine
+    # NO DATABASE OF ROOM SIZES (2026-07-30): the school tracks machine
     # counts on their end. The working size is simply the highest number we
     # have ever seen or assigned - it auto-grows when a bigger number shows up
     # in a log or a rule, and #1000-2000 on an imaginary room is legal. The
@@ -9371,7 +9371,7 @@ function Invoke-DryRun {
 # ============================================================
 #  Config saves: NAMED (deliberate) vs SNAPSHOTS (automatic)
 # ============================================================
-# Two shelves, on purpose (Blake, 2026-07-30): config/saved/<name>/ holds
+# Two shelves, on purpose (2026-07-30): config/saved/<name>/ holds
 # deliberate keepers like "Summer 2026"; config/snapshots/ holds the automatic
 # dated emergency backups every write already makes. Restoring either kind
 # snapshots the current state FIRST, so a restore is itself undoable.
@@ -9551,7 +9551,7 @@ function Update-SavedConfigList {
 # The intent map, as a matrix: one row per room/segment, one column per
 # program, a tick where that program is assigned. Columns are the UNION of
 # everything assigned anywhere (not all 42 cards) so the grid stays readable.
-# ---- Coverage drill-down (Blake, 2026-07-30) --------------------------------
+# ---- Coverage drill-down (2026-07-30) --------------------------------
 # The flat matrix is gone. It put ~40 program names on their SIDE across the top
 # and one row per room/segment - unreadable past a handful of rooms, and it
 # forced the whole campus into one screen whether you cared about it or not.
@@ -9581,7 +9581,7 @@ function Get-CVCodes {
 }
 
 function Get-CoverageBuildings {
-    # ONE CARD PER BUILDING, not per code (Blake, 2026-07-30). A building can own
+    # ONE CARD PER BUILDING, not per code (2026-07-30). A building can own
     # any number of campus codes - ENG is 55 AND 56, ARTS is 26 and 27 - and to
     # anyone standing in it that is one building. They are merged HERE, in the
     # display layer, keyed by abbreviation.
@@ -9639,7 +9639,7 @@ function Get-CoverageBuildings {
             Configured = [bool](@($codes | Where-Object { $ruleB[$_] }).Count)
         })
     }
-    # Blake's order: CONFIGURED FIRST, then the rest - alphabetical within each
+    # the order: CONFIGURED FIRST, then the rest - alphabetical within each
     # group. The buildings you actually run are always top-left; the greyed-out
     # remainder is there so "is that one set up?" is answerable at a glance.
     return ($out | Sort-Object @{ Expression = { if ($_.Configured) { 0 } else { 1 } } },
@@ -9692,7 +9692,7 @@ function Get-CoverageSegments {
                               Assigned = $false; Tail = $false; Source = 'no rule covers these'
                               Apps = (New-AppSet @()); RuleRef = $null; Overlap = ''; Inherited = $null })
         }
-        # OVERLAP (Blake, 2026-07-31): this loop never rewinds $next, so two rules
+        # OVERLAP (2026-07-31): this loop never rewinds $next, so two rules
         # claiming the same machines used to pass through silently and the later
         # one was simply dead - a real first-match-wins hazard the room view hid.
         # Flagging it costs one comparison and gives the ledger something true to
@@ -9884,7 +9884,7 @@ function New-CoverageNote {
 }
 
 # ============================================================
-#  Room level - "Ledger and Rail"  (Blake, 2026-07-31)
+#  Room level - "Ledger and Rail" (2026-07-31)
 # ============================================================
 # The room's subject is a SEQUENCE OF MACHINE NUMBERS, so it reads down the
 # page like a ledger rather than across it like a shelf of tiles. Three
@@ -10356,7 +10356,7 @@ function New-LabDialog {
     # window, so the font and the render settings have to be restated or the
     # dialogs quietly drift from the app. FontFamily defaults to whatever
     # SystemFonts.MessageFontFamily is, which happens to be Segoe UI on an
-    # English desktop; that is a coincidence, not a guarantee. (Blake, 2026-07-31)
+    # English desktop; that is a coincidence, not a guarantee. (2026-07-31)
     $w.FontFamily         = New-Object System.Windows.Media.FontFamily 'Segoe UI'
     $w.UseLayoutRounding  = $true
     [System.Windows.Media.TextOptions]::SetTextFormattingMode($w, 'Display')
@@ -10656,7 +10656,7 @@ function Show-AddClassroomDialog {
     if ($codes.Count -gt 1) {
         $null = Add-DlgRow -Dlg $dlg -Label 'Which Building Code:' -Control $cCode
     }
-    # The machine-type question was REMOVED 2026-07-30 (Blake: "we actually dont
+    # The machine-type question was REMOVED 2026-07-30 ("we actually dont
     # care about that, as long as 10101LAB and 10101ATS show up in the SAME room
     # we gucci"). Rules still support a `types` filter and the engine still takes
     # one - it is just never asked for here, so every room written from this
@@ -11388,7 +11388,7 @@ function Initialize-MasterTabs {
     $pm = $window.FindName('pnlSettingsMaster')
     if ($pm) { $pm.Visibility = [System.Windows.Visibility]::Visible }
 
-    # Same 75% wheel rate as the main card list (Blake, 2026-07-29 - the Master
+    # Same 75% wheel rate as the main card list (2026-07-29: - the Master
     # tabs were still at the stock Windows rate and overshot). Named explicitly
     # rather than tree-walked: a TabControl only realises the SELECTED tab's
     # visual tree, so an unselected tab would be missed by a walk done here.
@@ -11580,7 +11580,7 @@ function Initialize-MasterTabs {
     # Enter, not TextChanged: refiltering rebuilds every tile in every room, so
     # doing it per keystroke would stutter on a big store.
     $script:MW.txtFleetSearch.Add_KeyDown({ param($s, $e) if ($e.Key -eq 'Return') { Update-FleetRooms } })
-    # Selection keys (Blake, 2026-08-03). Esc clears. The Alt gate is not
+    # Selection keys (2026-08-03). Esc clears. The Alt gate is not
     # optional: WPF turns a bare Alt into SystemKey and moves focus to the menu
     # cues, which steals the keystroke Alt+Click depends on and makes the range
     # select feel randomly broken. Swallowing SystemKey on the map keeps Alt a
@@ -11611,7 +11611,7 @@ function Initialize-MasterTabs {
     # All seven Layout Designer actions share one after-save routine: redraw the
     # map, redraw the Config tab's raw list so the two views can never disagree,
     # and put the record layer's own sentence in the title bar. Written once
-    # (Blake, 2026-07-31) rather than copied seven times - the earlier four had
+    # (2026-07-31) rather than copied seven times - the earlier four had
     # already drifted apart on which lists they refreshed.
     $coverDone = {
         param([bool]$Saved, [bool]$Buildings)
@@ -12108,7 +12108,7 @@ function Remove-AppShortcut {
 # card behaves exactly as before. Distinct from noShortcut, which means "this
 # app never has a desktop icon at all" - here the card still HAS a shortcut
 # concept (chip, manual Shortcut button), we just stop creating it for you.
-# Blake's reason: "in case later down the line they decide they don't want a
+# the reason: "in case later down the line they decide they don't want a
 # messy desktop anymore."
 function Test-AppAutoShortcut {
     param([string]$AppId)
@@ -12776,7 +12776,7 @@ function Get-ImagedDate {
 }
 
 # ============================================================
-#  Pre-install image gate  (Blake, 2026-07-29)
+#  Pre-install image gate (2026-07-29)
 # ============================================================
 # Two situations where installing is probably a waste of an afternoon:
 #   OLD     - the image is more than a year old -> a reimage is likely due, and
@@ -12786,7 +12786,7 @@ function Get-ImagedDate {
 #
 # BOTH are gated on the hostname matching the campus convention
 # (ConvertFrom-LabHostname .Matched). That is deliberate and is the whole reason
-# this cannot fire on Blake's own PC: DEV-DESKTOP does not match
+# this cannot fire on the dev PC: DEV-DESKTOP does not match
 # ^\d{5,7}[A-Za-z]+\d+-\d+$, so a personal machine with no timestamp_Cart.txt and
 # no imaging history is silently exempt from both warnings - it is not a lab PC
 # and has no image to be stale.
@@ -12939,7 +12939,7 @@ function Get-OpenedState {
 # AND this imaging instance. (imagedStamp match is what auto-resets on re-image.)
 # Does NOT-having-opened this app actually count against the machine?
 #
-# Two separate ideas that were being conflated (Blake, 2026-07-30: "not opening
+# Two separate ideas that were being conflated (2026-07-30: "not opening
 # should not be a failure unless a program specifically needs to be opened to
 # run things"):
 #   needsOpen     - the tool LAUNCHES it after installing. Nearly everything
@@ -12989,7 +12989,7 @@ $script:NeedsOpenPromptTimeoutSec = 30
 # How long THIS app's prompt should wait. Normally the shared 30s, but a card
 # can set openPromptNoTimeout:true to get a prompt that never self-dismisses.
 #
-# WHY THE EXCEPTION EXISTS (Blake, 2026-08-05): the countdown is right for a
+# WHY THE EXCEPTION EXISTS (2026-08-05): the countdown is right for a
 # "did you click through the wizard?" check - if nobody is there, carry on and
 # leave the card yellow. It is wrong for a LICENCE prompt, which carries the
 # actual key the tech has to type. That text disappearing after 30 seconds
@@ -13137,7 +13137,7 @@ function Show-TimedConfirm {
     # Owned by the main window so it can never end up behind the LabDeploy GUI.
     #
     # NOT Topmost, and NOT centre-screen - both were actively self-defeating
-    # (Blake, 2026-07-29): this dialog exists to say "go open that app and click
+    # (2026-07-29): this dialog exists to say "go open that app and click
     # through its prompts", and a topmost window parked dead centre sat on top of
     # the very app - and of the app's own wizard, which centres itself too - so it
     # physically blocked the thing it was asking for. Owner alone keeps it above
@@ -13287,7 +13287,7 @@ function Get-AppRegistrationBlock {
 
 # Is this app's manual step already being handled by a companion card?
 #
-# THE BUG THIS FIXES (Blake, 2026-08-06): LabChart sets needsOpen so a tech is
+# THE BUG THIS FIXES (2026-08-06): LabChart sets needsOpen so a tech is
 # asked to type its licence. Once LabChartLicenseSci2Bio existed, that typing
 # became unnecessary on every laptop but the first - the licence file is copied
 # in. But the prompt still fired, because the needs-open gate runs immediately
@@ -13327,7 +13327,7 @@ function Test-ManualStepCoveredByCard {
 
 # Queue any card that declares itself a FOLLOWER of the app just installed.
 #
-# THE GAP THIS CLOSES (Blake, 2026-08-06): install.requires is one-directional.
+# THE GAP THIS CLOSES (2026-08-06): install.requires is one-directional.
 # It guarantees "install LabChart BEFORE the licence card", but nothing pulls the
 # licence card in AFTER LabChart. So a tech who clicks Install on the LabChart
 # card alone - not Install All - got LabChart with no licence and no hint that a
@@ -13449,7 +13449,7 @@ function Open-App {
             # exe's own folder as CWD - never the GUI's. This GUI runs from the
             # stick, and a bare Start-Process made the child inherit the stick
             # as its working directory: MATLAB's post-install auto-open landed
-            # a tech in D:\LabDeployment (Blake, 2026-08-13) while the student
+            # a tech in D:\LabDeployment (2026-08-13) while the student
             # shortcut, with -useStartupFolderPref, opens in MATLAB\Projects.
             # The tech's verification open should behave like the student's.
             $wd = try { if (Test-Path $exe -PathType Container) { $exe } else { Split-Path $exe -Parent } } catch { $null }
@@ -13525,7 +13525,7 @@ function Update-OpenBox {
     $appDef = $script:AppsConfig.apps.$AppId
     $installed = $script:DetectionCache.ContainsKey($AppId) -and $script:DetectionCache[$AppId].Installed -and -not $script:DetectionCache[$AppId].UserOnly
     # "Open app" is shown for ANY installed app, not just needsOpen ones
-    # (Blake, 2026-08-06): after installing something you often just want to
+    # (2026-08-06): after installing something you often just want to
     # launch it and look, and hunting the Start Menu for an app you just put on
     # the machine is exactly the friction this tool exists to remove. It is
     # gated on `installed` only - launching something that is not there would
@@ -13559,7 +13559,7 @@ function Update-OpenBox {
 # ============================================================
 #  Dark-Mode Colors
 # ============================================================
-# DesignerUp status colours (Blake, 2026-07-30): locked to the jewel S/B band
+# DesignerUp status colours (2026-07-30): locked to the jewel S/B band
 # (S 73-83, B 56-76), hue is the only thing that varies - so they match the
 # button system by construction. Previous: #4EC749 / #F85149 / #D29922.
 $script:BrushGreen  = [System.Windows.Media.SolidColorBrush]::new([System.Windows.Media.Color]::FromRgb(0x26,0x9E,0x58))  # H145 S76 B62
@@ -13621,7 +13621,7 @@ $script:BrushTagBrown     = New-FrozenBrush 0x55 0x39 0x1B   # method tag: inter
 $script:BrushTagTeal      = New-FrozenBrush 0x1F 0x3A 0x2F   # method tag: offload
 # Assign / Coverage: the INTENT domain. Deliberately purple, never green/amber/
 # red - "what a machine should have" must never read as "what it has".
-# Rail card chrome (Blake, 2026-07-31) - the app-card row look from
+# Rail card chrome (2026-07-31) - the app-card row look from
 # design/body-redesign-mockups.html: dark row plates with a status spine,
 # exception-only pill chips, one primary + Uninstall + a "..." menu.
 $script:BrushRowBg        = New-FrozenBrush 0x23 0x23 0x23   # card row fill
@@ -13645,14 +13645,14 @@ $script:BrushChipBadBg.Freeze(); $script:BrushChipWarnBg.Freeze()
 $script:BrushIntent       = New-FrozenBrush 0x6E 0x3F 0xA3   # coverage tick
 $script:BrushWhite        = New-FrozenBrush 0xFF 0xFF 0xFF   # dialog field labels: plain white, not the softer body grey
 $script:BrushRaiseSel     = New-FrozenBrush 0x33 0x21 0x46   # selected segment row
-# Status Dock footer (Blake, 2026-07-31): indicator-chip dots + band inks.
+# Status Dock footer (2026-07-31): indicator-chip dots + band inks.
 # Dot colours match the health pill's dots so "green dot = healthy" reads the
 # same at both ends of the window.
 $script:BrushDotOn        = New-FrozenBrush 0x4E 0xC7 0x49   # chip dot: on / present
 $script:BrushDotOff       = New-FrozenBrush 0x55 0x55 0x5E   # chip dot: off / idle
 $script:BrushDotWarn      = New-FrozenBrush 0xD9 0xA5 0x21   # chip dot: action needed; also the STALE amber
 $script:BrushStickMuted   = New-FrozenBrush 0xA9 0xA9 0xB4   # band's master line default ink
-# Layout Designer room level - "Ledger and Rail" (Blake, 2026-07-31).
+# Layout Designer room level - "Ledger and Rail" (2026-07-31).
 # These exist because the room level is built in CODE while the rest of the tab
 # chrome is XAML literals; without frozen twins the code-built plate would not
 # match the plates beside it. BrushMutedCool is the XAML's #8a8a95, which is a
@@ -14000,7 +14000,7 @@ function Test-AppInstalled {
             } catch { }
         }
         'filematch' {
-            # CONTENT detection for config-copy cards (Blake, 2026-08-06).
+            # CONTENT detection for config-copy cards (2026-08-06).
             #
             # Every other method answers "is something there?". This one answers
             # "is the RIGHT thing there?" - it hashes each staged file against
@@ -14073,7 +14073,7 @@ function Test-AppInstalled {
             # is RE-CHECKED on every scan - not a marker file recording that it
             # was once true. If someone later edits PATH, the card goes red again.
             #
-            # WHY THIS METHOD EXISTS (Blake, 2026-08-21): "It throws the correct
+            # WHY THIS METHOD EXISTS (2026-08-21): "It throws the correct
             # version but the execution app alias is defaulting to a local version
             # that isn't added to path". Windows ships 0-byte App Execution Alias
             # stubs for python.exe/python3.exe in %LOCALAPPDATA%\Microsoft\WindowsApps,
@@ -14276,7 +14276,7 @@ function ConvertFrom-LabHostname {
 # deployment-rules.json: ordered list; FIRST matching rule wins.
 #   rule = { building: "55", rooms: "103,204-210" (blank=all), types: "CART,LAB"
 #            (blank=all), machines: "30-60" (blank=all), profile: "ENG" }
-# Blake's "same room, #30-60 get A, #61-90 get B" is two rules on one room.
+# the "same room, #30-60 get A, #61-90 get B" is two rules on one room.
 function Test-NumToken {
     # does integer $n fall inside a token list like "5, 30-60, 103"? blank = all
     param([string]$Tokens, [int]$N)
@@ -14322,7 +14322,7 @@ function Resolve-DeployRule {
 # Tests for the PROPERTY, never for emptiness: `apps: []` is a real, meaningful
 # answer - "these machines get NOTHING" - and that is the whole point. Before
 # this existed, "none" could only happen by accident when no rule matched at
-# all, so a broad rule could never be overridden back down to empty; Blake's
+# all, so a broad rule could never be overridden back down to empty; the
 # "#01-60 get the ENG set, the rest get none" was literally not expressible.
 # Inline lists also mean two segments of one room can differ without inventing
 # a room profile per segment, so editing one segment can no longer silently
@@ -14715,7 +14715,7 @@ function Clear-InstallQueue {
 }
 
 function Resume-InstallQueue {
-    # PAUSE GATE (Blake, 2026-08-12). This function is the single between-
+    # PAUSE GATE (2026-08-12). This function is the single between-
     # installers boundary - every completion path funnels here before the next
     # app starts - so this is the one safe place to hold a batch: the previous
     # installer has fully finished, nothing has been dequeued yet. The queue is
@@ -14776,7 +14776,7 @@ function Resume-InstallQueue {
                                     # set through a long sweep would let a
                                     # second finish double-report.
         Update-Summary
-        # ALWAYS the last step of Install All (Blake, 2026-07-30). Runs even if
+        # ALWAYS the last step of Install All (2026-07-30). Runs even if
         # some installs failed: the ones that DID land still deserve their icons,
         # and this is the moment the room is otherwise finished.
         try {
@@ -15425,7 +15425,7 @@ function Start-SingleUninstall {
     TextOptions.TextRenderingMode="ClearType">
 
     <Window.Resources>
-        <!-- Header plate accent (Blake, 2026-07-31): #2E4EED drives the spine,
+        <!-- Header plate accent (2026-07-31): #2E4EED drives the spine,
              the titlebar tint, the decode line, Refresh All, and the active-tab
              underline. Declared FIRST: templates above resolve StaticResource
              forward references lazily, but XamlReader's deferred dictionaries
@@ -15433,7 +15433,7 @@ function Start-SingleUninstall {
         <SolidColorBrush x:Key="AccentBrush" Color="#2E4EED"/>
 
         <!-- ============================================================
-             Button colours - DesignerUp jewel/neutral system (Blake, 2026-07-30)
+             Button colours - DesignerUp jewel/neutral system (2026-07-30)
              ============================================================
              Two bands only, defined in HSB (every brush carries its HSB so the
              band is auditable):
@@ -15452,7 +15452,7 @@ function Start-SingleUninstall {
                BtnPrimary #107C10, BtnAccent #0078D4, BtnBlue #1F4A6E,
                BtnPurple #4A2E6E, BtnNeutral #50505A, BtnDanger #8B2E2E,
                BtnStateOn #145A2E, BtnStateOff #555555. -->
-        <!-- Primary re-anchored to the header accent #2E4EED (Blake, 2026-07-31)
+        <!-- Primary re-anchored to the header accent #2E4EED (2026-07-31)
              so Install All Missing, Refresh All, and the progress fills all
              speak ONE blue, exactly like the HTML mockups. -->
         <SolidColorBrush x:Key="BrushPrimary"        Color="#2E4EED"/>
@@ -15614,7 +15614,7 @@ function Start-SingleUninstall {
             </Setter>
         </Style>
 
-        <!-- Quiet DARK secondary (Blake, 2026-07-31), matching the mockups'
+        <!-- Quiet DARK secondary (2026-07-31), matching the mockups'
              chrome: #2A2A33 fill, hairline border, light text - replaces the
              light chips that fought the dark plates. Same 130ms hover ease. -->
         <Style x:Key="SecondaryButton" TargetType="Button">
@@ -15770,7 +15770,7 @@ function Start-SingleUninstall {
             </Setter>
         </Style>
 
-        <!-- Indicator chip (Blake, 2026-07-31): the footer's Caffeine/winget
+        <!-- Indicator chip (2026-07-31): the footer's Caffeine/winget
              readouts, restyled from green jewel-lookalike buttons into pill
              chips - same language as the health pill on the tab rail. The
              clickable Button stays (handlers keep their names); state is now
@@ -15862,7 +15862,7 @@ function Start-SingleUninstall {
             <Setter Property="Padding" Value="6,4"/>
         </Style>
 
-        <!-- Underline tabs (Blake, 2026-07-31), matching the Rail mockups: no
+        <!-- Underline tabs (2026-07-31), matching the Rail mockups: no
              chip boxes - muted labels, faint hover wash, and a 3px accent bar
              under the active tab. 11px side padding keeps the master's 8 tabs +
              health pill + GP/CM sharing one row at 1180px. -->
@@ -15975,7 +15975,7 @@ function Start-SingleUninstall {
         </Style>
 
         <!-- ============================================================
-             Scrollbars (Blake, 2026-08-02)
+             Scrollbars (2026-08-02)
              ============================================================
              The default Windows scrollbar is light-grey chrome and reads as a
              foreign object on this dark UI. These are IMPLICIT styles (no
@@ -16066,7 +16066,7 @@ function Start-SingleUninstall {
         </Grid.RowDefinitions>
 
         <!-- ============================================================
-             Command Bar header  (Blake, 2026-07-31)
+             Command Bar header (2026-07-31)
              ============================================================
              Design 3 "Command Bar" from the header-fusion mockups: the
              two-tier plate AND the tab rail fused into ONE card, two rows.
@@ -16175,7 +16175,7 @@ function Start-SingleUninstall {
              indents the first tab to the mockup's 20px text inset. -->
         <TabControl Grid.Row="2" Name="tabMain" Background="Transparent" BorderThickness="0" Padding="0,16,0,0" Margin="0,0,0,12">
         <TabItem Header="Deploy" Name="tabDeploy" Margin="9,0,0,0">
-        <!-- Left margin 0 (Blake, 2026-08-02): aligns the app-list panel's left
+        <!-- Left margin 0 (2026-08-02): aligns the app-list panel's left
              edge with the header/footer cards (all share the outer 16px grid),
              so the status spines and the accent spines form one line. -->
         <Grid Margin="0,2,2,2">
@@ -16185,7 +16185,7 @@ function Start-SingleUninstall {
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-        <!-- The Machine Health strip that lived here (Blake, 2026-07-31) moved
+        <!-- The Machine Health strip that lived here (2026-07-31) moved
              to the tab row: a compact health PILL (dots + issue count, click
              for the breakdown popover) rides the tab strip's empty right side
              together with the GP Update / Run CM Actions buttons. See the
@@ -16195,7 +16195,7 @@ function Start-SingleUninstall {
              its whole subtree to an intermediate surface, and this one scrolls.
              If card scrolling ever stutters on lab hardware, delete THIS
              Effect first and leave the other panels alone. -->
-        <!-- Padding left=0 (Blake, 2026-08-02): the cards sit flush to the
+        <!-- Padding left=0 (2026-08-02): the cards sit flush to the
              panel's left edge so their status spines line up under the header
              and footer accent spines - one continuous accent line down the
              window instead of the old ~9px zigzag. Top/right/bottom keep 8. -->
@@ -16207,7 +16207,7 @@ function Start-SingleUninstall {
         </Border>
 
         <!-- The Bottom Action Buttons plate that lived in Grid.Row 2 moved
-             (Blake, 2026-07-31) into the global Status Dock footer card after
+ (2026-07-31) into the global Status Dock footer card after
              the status bar - one card for actions + status, Deploy-only rows
              collapse on the master tabs. Row 2 is now empty; the app list's old
              bottom margin went with it (the TabControl's own bottom margin is
@@ -16218,7 +16218,7 @@ function Start-SingleUninstall {
 
         <!-- ============ MASTER TABS (hidden unless C:\LabDeployMaster exists) ============ -->
 
-        <!-- Header renamed 2026-07-30 (Blake); the control name stays tabFleet
+        <!-- Header renamed 2026-07-30; the control name stays tabFleet
              so every binding, test and handler keeps working. Display name and
              control name are allowed to differ - renaming the control would
              touch dozens of sites for no behaviour change. -->
@@ -16364,7 +16364,7 @@ function Start-SingleUninstall {
             <DockPanel Margin="4">
                 <DockPanel DockPanel.Dock="Top" Margin="0,0,0,8">
                     <!-- Refresh is docked Right FIRST, so it is always the
-                         right-most button (Blake, 2026-07-30) - it is the one
+                         right-most button (2026-07-30) - it is the one
                          constant here, and a fixed target should not shuffle
                          sideways as the level-dependent actions come and go. -->
                     <Button Name="btnCoverRefresh" Content="Refresh" DockPanel.Dock="Right"
@@ -16372,7 +16372,7 @@ function Start-SingleUninstall {
                     <!-- Level actions sit to its LEFT. Only the ones that make
                          sense where you are standing are shown -
                          Update-CoverageMap owns their visibility. -->
-                    <!-- Room-level set completed 2026-07-31 (Blake): Room Size /
+                    <!-- Room-level set completed 2026-07-31: Room Size /
                          Split / Merge / Remove joined Add Program, which is
                          everything the Assign tab could do. Ordered structure
                          first (how the room is carved) then content (what those
@@ -16420,7 +16420,7 @@ function Start-SingleUninstall {
                     <TextBlock Name="txtCoverTitle" Text="Who gets what" Foreground="#aaa"
                                VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,8,0"/>
                 </DockPanel>
-                <!-- Room header (Blake, 2026-07-31): the plate + proportional
+                <!-- Room header (2026-07-31): the plate + proportional
                      rail + hover readout for the room level, built in code by
                      Show-CoverageRoom. Docked Top and OUTSIDE scrCover on
                      purpose - the rail is the room's index, so it must not
@@ -16805,7 +16805,7 @@ function Start-SingleUninstall {
         </TabControl>
 
         <!-- ============================================================
-             Health pill + GP/CM  (Blake, 2026-07-31) - rides the tab row
+             Health pill + GP/CM (2026-07-31) - rides the tab row
              ============================================================
              Same grid row as the TabControl, declared AFTER it so it paints on
              top, pinned to the right side of the Command Bar card's rail
@@ -16863,7 +16863,7 @@ function Start-SingleUninstall {
         </StackPanel>
 
         <!-- ============================================================
-             Status Dock footer  (Blake, 2026-07-31)
+             Status Dock footer (2026-07-31)
              ============================================================
              Design 3 "Status Dock" from the footer mockups: the Deploy tab's
              button plate, the status bar and the stick line fused into ONE
@@ -17015,7 +17015,7 @@ $pnlApps           = $window.FindName('pnlApps')
 $scrApps           = $window.FindName('scrApps')
 $btnInstallMissing = $window.FindName('btnInstallMissing')
 
-# Scroll speed: 75% of the Windows default (Blake, 2026-07-28 for the card list;
+# Scroll speed: 75% of the Windows default (2026-07-28: for the card list;
 # 2026-07-29 extended to every Master tab, which had been left at stock rate).
 # WPF has no scroll-rate property, so intercept the wheel and scroll a scaled
 # distance ourselves. PreviewMouseWheel fires before the ScrollViewer's own
@@ -17057,7 +17057,7 @@ $btnShortcuts      = $window.FindName('btnShortcuts')
 $btnPKI            = $window.FindName('btnPKI')
 $btnCaffeine       = $window.FindName('btnCaffeine')
 $btnWinget         = $window.FindName('btnWinget')
-# Status Dock chips + footer action row (Blake, 2026-07-31)
+# Status Dock chips + footer action row (2026-07-31)
 $dotCaffeine       = $window.FindName('dotCaffeine')
 $txtCaffeineChip   = $window.FindName('txtCaffeineChip')
 $dotWinget         = $window.FindName('dotWinget')
@@ -17124,7 +17124,7 @@ function Set-UiScale {
 }
 
 # ============================================================
-#  Fit to window  (Blake, 2026-07-30)
+#  Fit to window (2026-07-30)
 # ============================================================
 # The complaint this fixes: dragging the window smaller used to keep the UI at
 # its full size and just hang scrollbars on it, so a small window showed a
@@ -17336,7 +17336,7 @@ function New-AppCard {
     $isDisabled  = [bool]($appDef -and $appDef.disabled)
 
     # ============================================================
-    # Rail row (Blake, 2026-07-31), matching design/body-redesign-mockups.html:
+    # Rail row (2026-07-31), matching design/body-redesign-mockups.html:
     # [4px status SPINE][mid: name+tag / detail / chips / progress][actions].
     # The spine is a Rectangle stored under the historic 'Dot' key - Rectangle
     # has .Fill, so every consumer that recolours the old status dot recolours
@@ -17526,7 +17526,7 @@ function New-AppCard {
     # Shortcut chip: shown ONLY when the shortcut is missing (exception-only);
     # the chip IS the fix button - clicking it creates the shortcut.
     # STADIUM SHAPE, matching the footer's Caffeine/winget chips and the health
-    # pill on the tab rail: Height 28 + CornerRadius 14 (Blake, 2026-08-06).
+    # pill on the tab rail: Height 28 + CornerRadius 14 (2026-08-06).
     # Was radius 20 on an auto-height border, which is a DIFFERENT shape - the
     # radius exceeded half the height, so WPF drew the ends as an oval lens
     # rather than a true stadium. Half the height is the whole trick; see the
@@ -18123,7 +18123,7 @@ function Get-InstalledVersion {
 }
 
 # ============================================================
-#  The card's detail line  (Blake, 2026-08-03)
+#  The card's detail line (2026-08-03)
 # ============================================================
 # It used to print raw detection output: the full install path when green
 # ("C:\Program Files\ImageJ") and the entire searched-locations list when red
@@ -18887,7 +18887,7 @@ $script:installTimer.Add_Tick({
                         #             installed, so the app is incomplete and will
                         #             not launch. NI feed installs RESUME, so the
                         #             fix is restart + Install again.
-                        # Blake was one step from reinstalling LabVIEW by hand
+                        # a tech was one step from reinstalling LabVIEW by hand
                         # because a -125071 read as "stopped early". It had worked.
                         $rebootPending = ($code -eq -125071)
                         if ($rebootPending) {
@@ -18918,7 +18918,7 @@ $script:installTimer.Add_Tick({
                 # KEEP THE BATCH GOING. Only the SUCCESS path reached the verify
                 # timer, and that timer is the only thing that called
                 # Resume-InstallQueue - so a failed install silently ABORTED the
-                # rest of "Install All". Proven in Blake's run of 2026-07-27:
+                # rest of "Install All". Proven in the run of 2026-07-27:
                 # LabVIEW reported failure at 02:28:35 and MATLAB, the next and
                 # last item, never started. In a lab that means a tech watches
                 # one app fail and never learns that everything after it was
@@ -19138,8 +19138,8 @@ $script:installTimer.Add_Tick({
                         exitCode = $code
                         time = $timeStr
                     }
-                    # RESIDUE SURVEY - report only, delete nothing (Blake,
-                    # 2026-07-30: E46's caution stays; just show what the vendor
+                    # RESIDUE SURVEY - report only, delete nothing (2026-07-30
+                    # : E46's caution stays; just show what the vendor
                     # uninstaller left so cleanup is a per-app human decision).
                     $residue = Get-UninstallResidue -AppId $script:installAppId
                     if ($residue.Count -gt 0) {
@@ -19706,7 +19706,7 @@ function Start-SingleInstall {
         }
     }
     if (-not $FromQueue -and (Test-WindowsInstallerBusy)) {
-        # Name the culprit when we can (Blake, 2026-08-12): "busy" alone forced
+        # Name the culprit when we can (2026-08-12): "busy" alone forced
         # a guess about whether to wait or override.
         $busyWith = Get-WindowsInstallerBusyProduct
         $busyLine = if ($busyWith) { "Windows Installer is currently installing: $busyWith" }
@@ -19728,7 +19728,7 @@ function Start-SingleInstall {
 
     # --- PENDING-REBOOT: RECORDED, NEVER BLOCKING (E73 gate DELETED 2026-07-29) ---
     # There used to be a hard gate here that skipped an install when Windows owed
-    # a restart. It is gone, at Blake's call, and it was wrong to add:
+    # a restart. It is gone, at a deliberate call, and it was wrong to add:
     #   * It was speculation. On 07-28 we had THREE theories for why Rockwell CCW
     #     kept dying and this was one of them. The real cause was OUR bug - the
     #     VSIsoShell2015 detect path pointed at files the bundle never copies, so
@@ -20308,7 +20308,7 @@ function Set-RoomApps {
         # timer's completion block -- which writes the snapshot AND runs the Refresh-All push
         # AND the -Auto Install-All hand-off -- never fired, and machines like 64/65/66 could
         # NEVER reach the dashboard ("Refresh All did nothing when there were no cards").
-        # Design (Blake, 2026-08-19): a valid decoded name in a real room is ALWAYS treated
+        # Design (2026-08-19): a valid decoded name in a real room is ALWAYS treated
         # as at least GP/CM-only and MUST report, cards or not. So start the scan timer even
         # with an empty queue: its first tick immediately hits the same completion block a
         # normal scan does, snapshotting and -- on a Refresh All ($PushAfterScan) or an
@@ -20377,7 +20377,7 @@ $btnRefreshAll.Add_Click({
     }
 })
 
-# DEDICATED CLOUDFLARE SYNC (Blake, 2026-08-19: "add a dedicated sync button, make it
+# DEDICATED CLOUDFLARE SYNC (2026-08-19: "add a dedicated sync button, make it
 # bulletproof, show when it's sending and when it's done"). Unlike Refresh All, this is
 # NOT gated on a loaded room, program cards, or a completed scan - it calls Push-Observations
 # straight on the stick's logs. Push-Observations ALWAYS re-sends the current session's live
@@ -20453,7 +20453,7 @@ $btnSyncCloud.Add_Click({
 })
 
 $btnInstallMissing.Add_Click({
-    # PAUSE / CONTINUE while a batch is mid-flight (Blake, 2026-08-12). The
+    # PAUSE / CONTINUE while a batch is mid-flight (2026-08-12). The
     # button stays ENABLED during a batch and toggles:
     #   running          -> click = pause AFTER the current installer finishes
     #   pause requested  -> click = never mind, keep going
@@ -20527,7 +20527,7 @@ $btnInstallMissing.Add_Click({
     #    20   methodLabel contains "interactive"     (needs a human)
     #    install.installOrder = N  OVERRIDES all of the above
     #
-    # Blake 2026-07-29: MATLAB must be 2nd-to-last and MatlabArduino dead last
+    # 2026-07-29: MATLAB must be 2nd-to-last and MatlabArduino dead last
     # (installOrder 90 / 100) - i.e. AFTER the wizards. That deliberately
     # reverses the earlier "interactive last" tweak, and the reasoning is
     # one-visit deployment: the tech clicks through every wizard while standing
@@ -20613,7 +20613,7 @@ $btnInstallMissing.Add_Click({
 # each card's Shortcut chip as it goes.
 #
 # A function, not just a button handler, because "Install All Missing" runs it
-# automatically as its final step (Blake, 2026-07-30). Per-app shortcut repair
+# automatically as its final step (2026-07-30). Per-app shortcut repair
 # already happens after each individual install, but a batch is exactly when
 # things drift: a dependency installed mid-chain, an app that arrived via the
 # retry path, or a vendor installer that dropped its own differently-named icon.
@@ -20714,7 +20714,7 @@ function Start-Caffeine {
 }
 function Set-CaffeineState {
     param([bool]$On)
-    # Chip indicator (Blake, 2026-07-31): state lives in the dot + label now,
+    # Chip indicator (2026-07-31): state lives in the dot + label now,
     # not the button background - the chip chrome itself never changes.
     if ($On -and (Start-Caffeine)) {
         $script:CaffeineOn    = $true
@@ -20748,7 +20748,7 @@ function Test-WingetPresent {
     return (Test-Path (Join-Path $env:LOCALAPPDATA 'Microsoft\WindowsApps\winget.exe'))
 }
 function Update-WingetButton {
-    # Chip indicator (Blake, 2026-07-31): dot + label, not button background.
+    # Chip indicator (2026-07-31): dot + label, not button background.
     if (Test-WingetPresent) {
         $txtWingetChip.Text = 'winget'
         $dotWinget.Fill     = $script:BrushDotOn
@@ -20846,8 +20846,8 @@ Update-WingetButton   # set the real state at startup
 # ============================================================
 #  Machine Health pill  (imaging timestamp / GP / CM / PKI)
 # ============================================================
-# The old chip strip, compressed into a pill on the tab row (Blake,
-# 2026-07-31): each key owns a DOT in the pill and a ROW in the click-open
+# The old chip strip, compressed into a pill on the tab row (2026-07-31
+# ): each key owns a DOT in the pill and a ROW in the click-open
 # popover. Set-HealthChip keeps its signature, so all eleven call sites are
 # untouched - they now recolour a dot, rewrite a popover row, and re-aggregate
 # the pill ("2 issues" amber, "1 issue" red if any bad, "healthy" grey).
@@ -20978,7 +20978,7 @@ function Apply-HealthVisibility {
     if ($b) { $b.Visibility = if ($Config.pki) { [System.Windows.Visibility]::Visible } else { [System.Windows.Visibility]::Collapsed } }
 }
 
-# GP chip retired (Blake, 2026-08-12): "GP: 3d ago / unknown" never drove a
+# GP chip retired (2026-08-12): "GP: 3d ago / unknown" never drove a
 # decision - PKI is the chip that actually catches a GP problem (no cert = GP
 # hasn't delivered), and the GP Update button carries its own live state. The
 # last-processed time still lands in the health.strip ledger entry.
@@ -21122,7 +21122,7 @@ function Update-HealthStrip {
 }
 
 # ---- GP Update button: gpupdate /force with the button as the progress bar ----
-# Click once to start; CLICK AGAIN TO CANCEL (Blake, 2026-08-12 - a hung GP
+# Click once to start; CLICK AGAIN TO CANCEL (2026-08-12: - a hung GP
 # update used to leave only "reboot the GUI" as the way out, and even that
 # orphaned the gpupdate pair: the next session's run then queued behind the
 # orphan on the GP engine's own serialisation, which read as "GP takes
@@ -21164,7 +21164,7 @@ $script:gpTimer.Add_Tick({
             # Phase-based progress: gpupdate reports completion per policy type.
             # The elapsed clock is the honest part - the output file is buffered
             # by cmd.exe, so the bar alone can sit still while work continues.
-            # WHERE THE TIME WENT (Blake, 2026-08-12): record the moment the
+            # WHERE THE TIME WENT (2026-08-12): record the moment the
             # computer phase hands off to the user phase, so the ledger can say
             # "computer took 11 min, user took 20s" instead of just "slow".
             if     ($out -match 'User Policy update has completed')     { $pbGP.Value = 95 }
@@ -21317,7 +21317,7 @@ $btnGPUpdate.Add_Click({
 $script:cmActions = @()
 $script:cmIndex   = 0
 $script:cmFails   = 0
-# CM RETRY (Blake 2026-08-21): right after gpupdate the CM/WMI plumbing is often
+# CM RETRY (2026-08-21): right after gpupdate the CM/WMI plumbing is often
 # busy, so trigger calls bounce in a burst (failed=10) and 15s later succeed. A
 # 40-second stick visit pushed that burst as "__cm__ missing" and stranded five
 # healthy machines purple on the dashboard. So: a pass with failures no longer
@@ -21424,7 +21424,7 @@ $btnCMActions.Add_Click({
     $script:cmFailedActions = @(); $script:cmRetryPass = $false
     $script:cmTotalAll = $script:cmActions.Count
     $pbCM.Value = 2; $txtCMBtn.Text = "CM: 0/$($script:cmActions.Count)"
-    # Record the action NAMES, not just the count. Blake's field report was
+    # Record the action NAMES, not just the count. the field report was
     # "only 2 actions showed up when there are usually more" - that is only
     # diagnosable if the log says WHICH two the applet exposed.
     $cmNames = @()

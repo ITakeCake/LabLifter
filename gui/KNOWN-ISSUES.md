@@ -149,7 +149,7 @@ rebuilding stale indexes · the doc set (Logisim, MATLAB-DEPLOY-NOTES banner,
 E61/E21, ShowPreview comment, uninstall-button comment, QUARC prereq) · apps in
 no room (was 18 of 39, now 6 of 40, 2 documented + Npcap now flagged)
 
-**Open, Blake's call (1)**
+**Open, a deliberate call (1)**
 Two orphaned vendor installers on the drive (NI Package Manager *online*,
 Xilinx Unified *web*). Wrong-version risk, not a space problem. See ROADMAP.
 

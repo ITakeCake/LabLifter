@@ -84,6 +84,17 @@ $script:FleetColors = @{
     red    = New-FrozenBrush 0x6E 0x1E 0x1E; grey   = New-FrozenBrush 0x3A 0x3A 0x40
     card   = New-FrozenBrush 0x2D 0x2D 0x33
     blue   = New-FrozenBrush 0x1E 0x3A 0x6E   # reported missing
+    purple = New-FrozenBrush 0x4A 0x2E 0x6E
+    orange = New-FrozenBrush 0x7A 0x3C 0x0A
+}
+# Machine-tile fills: their own palette, matching the LabBoard dashboard wall so
+# a tile reads the same colour in both views. Top-level in the real script, so
+# the AST loader (functions only) leaves it $null here and New-FleetTile throws.
+$script:TileColors = @{
+    green  = New-FrozenBrush 0x2E 0xA0 0x43; yellow = New-FrozenBrush 0xD4 0xA0 0x17
+    red    = New-FrozenBrush 0xE5 0x48 0x4D; purple = New-FrozenBrush 0x89 0x57 0xE5
+    orange = New-FrozenBrush 0xD9 0x73 0x0D; blue   = New-FrozenBrush 0x3B 0x6F 0xB0
+    grey   = New-FrozenBrush 0x3A 0x3A 0x40
 }
 $script:ScrollScale = 0.75
 $script:IsMaster = $false   # Publish-FleetIssues (called by Update-FleetRooms) no-ops off-master
@@ -242,7 +253,7 @@ ok (@($bar.Child.Children | Where-Object { "$($_.Background)" -eq "$($script:Fle
 $b2 = New-RoomBar -Ok 5 -Warn 0 -Bad 0 -Untouched 0 -Missing 2
 ok ($b2.Child.ColumnDefinitions.Count -eq 3) 'missing machines add a gap column plus a stub'
 ok ($b2.Child.ColumnDefinitions[1].Width.Value -eq 2) 'the gap is a fixed 2px, not proportional'
-ok (@($b2.Child.Children | Where-Object { "$($_.Background)" -eq "$($script:FleetColors.blue)" }).Count -eq 1) 'and the stub is blue'
+ok (@($b2.Child.Children | Where-Object { "$($_.Background)" -eq "$($script:TileColors.blue)" }).Count -eq 1) 'and the stub is blue'
 ok ($null -eq (New-RoomBar -Ok 0 -Warn 0 -Bad 0 -Untouched 0 -Missing 0)) 'an empty room draws no bar at all'
 
 '--- professional tooltips (Azure / Windows Security language) ---'
@@ -386,7 +397,7 @@ $script:CV.Level = 'buildings'
 Update-CoverageMap
 $blds = @(Get-CoverageBuildings)
 ok ($blds.Count -eq 4) "building list built ($($blds.Count))"
-# Blake's exact example: ENG and HUM configured -> ENG then HUM (alphabetical), then the rest
+# the exact example: ENG and HUM configured -> ENG then HUM (alphabetical), then the rest
 # greyed out in alphabetical order.
 ok ("$(@($blds | ForEach-Object { $_.Abbr }) -join ',')" -eq 'ENG,HUM,ARTS,MARK') `
    "building order is ENG,HUM,ARTS,MARK (got $(@($blds | ForEach-Object { $_.Abbr }) -join ','))"

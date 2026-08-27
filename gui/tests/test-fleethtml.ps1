@@ -1,4 +1,4 @@
-﻿# The published fleet snapshot (Blake, 2026-08-18).
+﻿# The published fleet snapshot (2026-08-18).
 #
 # A read-only copy of the Deployment Tracker that can live somewhere other than
 # the master. The whole point is that it is ONE-WAY: the master writes a file and

@@ -81,11 +81,11 @@ $script:LogRoot           = $sand
 $script:BuildingsConfig   = [pscustomobject]@{ buildings = [pscustomobject]@{ '55' = [pscustomobject]@{ abbr = 'SCI1' } } }
 
 # ================= item 3: whitelist =================
-'{ "users": ["Blake","Viewer1"] }' | Set-Content $script:WhitelistFile -Encoding UTF8
+'{ "users": ["admin","Viewer1"] }' | Set-Content $script:WhitelistFile -Encoding UTF8
 $script:WhitelistCache = $null
 ok ((Import-Whitelist).Count -eq 2) "Import-Whitelist reads both users"
-ok (Test-UserWhitelisted 'Blake')   "whitelist: Blake approved"
-ok (Test-UserWhitelisted 'blake')   "whitelist: match is case-insensitive"
+ok (Test-UserWhitelisted 'admin')   "whitelist: admin approved"
+ok (Test-UserWhitelisted 'ADMIN')   "whitelist: match is case-insensitive"
 ok (-not (Test-UserWhitelisted 'mallory')) "whitelist: unknown user rejected"
 ok (-not (Test-UserWhitelisted ''))        "whitelist: empty user rejected"
 
@@ -95,7 +95,7 @@ $script:WhitelistCache = $null; $script:IsMaster = $true
 $seeded = Import-Whitelist
 ok ((Test-Path $script:WhitelistFile) -and $seeded.Count -ge 1) "whitelist: master seeds the file when missing"
 $script:IsMaster = $false; $script:WhitelistCache = $null
-'{ "users": ["Blake"] }' | Set-Content $script:WhitelistFile -Encoding UTF8
+'{ "users": ["admin"] }' | Set-Content $script:WhitelistFile -Encoding UTF8
 
 # ================= item 4: auto GP/CM =================
 # Get-AutoGpCmEnabled: default true (no file), true/false from file.
@@ -158,7 +158,7 @@ ok (-not $pc.ok) "pushConfig: no-op when telemetry disabled"
 $script:MockCfg = @{ enabled = $true; obsUrl = 'https://x.example/obs'; timeoutSec = 8 }
 $script:RestCalls = @(); $script:RestReply = @{ ok = $true }
 $pc = Push-MasterConfig
-ok ($pc.ok -and $pc.keys -eq 5) "pushConfig: master pushes 5 config keys (years/whitelist/buildings/needsopen/health_excluded)"
+ok ($pc.ok -and $pc.keys -eq 6) "pushConfig: master pushes 6 config keys (years/whitelist/buildings/needsopen/health_excluded/assignments)"
 ok ($script:RestCalls.Count -eq 1 -and $script:RestCalls[0].Uri -match '/config$') "pushConfig: posts to the /config endpoint"
 ok ($script:RestCalls[0].Body -match 'whitelist' -and $script:RestCalls[0].Body -match 'years') "pushConfig: body carries years + whitelist"
 $script:IsMaster = $false
@@ -171,12 +171,12 @@ ok (-not $out.Ok -and -not $out.Applied) "requestMark: blocked for non-whitelist
 ok ($script:RestCalls.Count -eq 0) "requestMark: no network call when blocked"
 # whitelisted but telemetry off -> friendly message, still no post
 $script:MockCfg = @{ enabled = $false; obsUrl = 'https://x.example/obs'; timeoutSec = 8 }
-$out = Request-FleetMark -Machine '10101LAB34-16' -State 'verified' -User 'Blake'
+$out = Request-FleetMark -Machine '10101LAB34-16' -State 'verified' -User 'admin'
 ok (-not $out.Ok -and $out.Msg -match 'off') "requestMark: whitelisted user, telemetry off => told it's off"
 # whitelisted + enabled -> posts to /mark-request and reports applied
 $script:MockCfg = @{ enabled = $true; obsUrl = 'https://x.example/obs'; timeoutSec = 8 }
 $script:RestCalls = @(); $script:RestReply = @{ ok = $true; applied = $true }
-$out = Request-FleetMark -Machine '10101LAB34-16' -State 'missing' -User 'Blake' -Note 'test'
+$out = Request-FleetMark -Machine '10101LAB34-16' -State 'missing' -User 'admin' -Note 'test'
 ok ($out.Ok -and $out.Applied) "requestMark: whitelisted+enabled => sent and applied"
 ok ($script:RestCalls.Count -eq 1 -and $script:RestCalls[0].Uri -match '/mark-request$') "requestMark: posts to /mark-request"
 
@@ -187,8 +187,8 @@ ok (-not $r.ok) "pullMarkReq: no-op when not the master"
 $script:IsMaster = $true
 $script:MarksCache = @{}; $script:SavedMarks = 0
 $script:RestReply = @{ ok = $true; requests = @(
-    @{ machine = '10101LAB34-16'; state = 'missing';  by = 'Blake'; ts = (Get-Date).ToString('o'); received_at = '2026-08-19T10:00:00.000Z' },
-    @{ machine = '10101LAB34-17'; state = 'verified'; by = 'Blake'; ts = (Get-Date).ToString('o'); received_at = '2026-08-19T10:00:01.000Z' }
+    @{ machine = '10101LAB34-16'; state = 'missing';  by = 'admin'; ts = (Get-Date).ToString('o'); received_at = '2026-08-19T10:00:00.000Z' },
+    @{ machine = '10101LAB34-17'; state = 'verified'; by = 'admin'; ts = (Get-Date).ToString('o'); received_at = '2026-08-19T10:00:01.000Z' }
 ) }
 $r = Pull-FleetMarkRequests
 ok ($r.ok -and $r.applied -eq 2) "pullMarkReq: applies 2 request-edits"
@@ -197,7 +197,7 @@ ok ($script:SavedMarks -ge 1) "pullMarkReq: persists the merged marks"
 ok ((Test-Path $script:MarkReqCursorFile)) "pullMarkReq: advances the pull cursor"
 # 'clear' removes a machine's marks
 $script:RestReply = @{ ok = $true; requests = @(
-    @{ machine = '10101LAB34-16'; state = 'clear'; by = 'Blake'; ts = (Get-Date).ToString('o'); received_at = '2026-08-19T11:00:00.000Z' }
+    @{ machine = '10101LAB34-16'; state = 'clear'; by = 'admin'; ts = (Get-Date).ToString('o'); received_at = '2026-08-19T11:00:00.000Z' }
 ) }
 Remove-Item $script:MarkReqCursorFile -Force -ErrorAction SilentlyContinue
 $r = Pull-FleetMarkRequests

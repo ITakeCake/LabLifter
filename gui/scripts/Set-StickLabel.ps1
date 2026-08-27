@@ -115,7 +115,7 @@ if (-not $DriveLetter -or -not $Number) {
 }
 
 $letter = $DriveLetter.TrimEnd(':').ToUpper()
-# New fleet scheme (Blake, 2026-07-29): LabDeploy-NN. 12 chars, mixed case -
+# New fleet scheme (2026-07-29): LabDeploy-NN. 12 chars, mixed case -
 # fine on NTFS (32-char labels), NOT on FAT32/exFAT (11-char ceiling). All
 # fleet sticks are NTFS by our own init pipeline; the guard below refuses the
 # long label on anything else instead of letting Set-Volume fail or truncate.

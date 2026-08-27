@@ -229,7 +229,7 @@ ok ((Get-FleetPageFor -ImagedGen '2027-03-02') -eq 2027) 'a March 2027 image is 
 ok ((Get-FleetPageFor -ImagedGen '2024-01-01') -eq 2026) 'anything older than every cutoff falls on the first page'
 ok ((Get-FleetPageFor -ImagedGen '') -eq (Import-FleetYears).Current) 'a machine with NO image stamp lands on the current page rather than vanishing'
 ok ((Get-FleetPageFor -ImagedGen 'not a date') -eq (Import-FleetYears).Current) 'and so does an unparseable one'
-# Blake's rule, stated as a test: same hostname, two generations, two machines.
+# the design rule, stated as a test: same hostname, two generations, two machines.
 $old = New-Rec -Name '10101LAB34-27' -Num 27 -Seen (Get-Date) -Gen '2026-07-11'
 $new = New-Rec -Name '10101LAB34-27' -Num 27 -Seen (Get-Date) -Gen '2027-01-20'
 ok ((Get-FleetPageFor -ImagedGen $old.ImagedGen) -ne (Get-FleetPageFor -ImagedGen $new.ImagedGen)) 'the same hostname sits on two pages when it has been reimaged'
@@ -253,7 +253,7 @@ $r = Remove-FleetYearRecord -Label 2026
 ok (-not $r.Ok -and $r.Msg -match 'only page') "the last page cannot be removed: $($r.Msg)"
 
 '--- excludeFromFleetHealth: a card that must never colour the map ---'
-# Blake, 2026-08-18: MatlabLabDefaults is a per-user MATLAB preference refresh,
+# 2026-08-18: MatlabLabDefaults is a per-user MATLAB preference refresh,
 # so a machine that has not had it re-applied is not a broken machine. Thirty ENG
 # boxes were YELLOW purely because of it, which buries the ones that genuinely
 # need attention. The card still goes red on its own Deploy-tab card; this is
@@ -322,7 +322,7 @@ $was = $script:Redraws
 ok ((Show-FleetYearPage -Label 2027) -and (Import-FleetYears).Current -eq 2027) 'and forward again'
 ok ($script:Redraws -eq $was + 1) 'a switch redraws the board exactly once'
 ok (-not (Show-FleetYearPage -Label 2099) -and (Import-FleetYears).Current -eq 2027) 'a page that does not exist is refused, and the view does not move'
-# The regression Blake hit: running Start New Year a second time used to leave
+# The regression this fixes: running Start New Year a second time used to leave
 # the board on the year he was trying to leave. The page already exists, so the
 # right answer is to go to it, not to error and sit still.
 [void](Show-FleetYearPage -Label 2026)

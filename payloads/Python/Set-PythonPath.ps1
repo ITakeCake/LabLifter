@@ -1,7 +1,7 @@
 <#
     Set-PythonPath.ps1 - the repair action behind the PythonPath card.
 
-    THE FIELD REPORT (Blake, 2026-08-21):
+    THE FIELD REPORT (2026-08-21):
       "It throws the correct version but the execution app alias is defaulting
        to a local version that isn't added to path"
 

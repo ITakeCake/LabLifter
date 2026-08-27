@@ -1,7 +1,7 @@
 ﻿# Config lint: schema + cross-reference checks over the REAL config files.
 # Nothing in the app validates apps.json field shape today - a typo'd install
 # method or a detect rule missing its paths only surfaces as E20/E10 on a lab
-# machine, when Blake is not there. This suite fails on the master instead.
+# machine, when the admin is not there. This suite fails on the master instead.
 #
 #   1. apps.json     - every card has the fields the engine actually consumes,
 #                      per install/detect method; requires ids exist, no cycles;

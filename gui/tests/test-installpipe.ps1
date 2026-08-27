@@ -283,7 +283,7 @@ ok ($script:VerifySweeps -eq 1) 'Verify Shortcuts auto-ran exactly once at batch
 
 ''
 '--- card detail line: a sentence, not raw detection output ---'
-# Blake, 2026-08-03: green printed the whole install path and red printed the
+# 2026-08-03: green printed the whole install path and red printed the
 # entire searched-locations list. Both wrapped; neither said "is it on, and
 # since when". These four functions are the display layer that replaced them.
 

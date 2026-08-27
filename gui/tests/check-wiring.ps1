@@ -2,7 +2,7 @@
 #
 #   1. Every FindName('X') literal in the source resolves to a Name="X" that
 #      actually exists - a renamed/deleted XAML control otherwise comes back
-#      $null and crashes at click time, on a lab machine, with Blake not there.
+#      $null and crashes at click time, on a lab machine, with the admin not there.
 #   2. Every Button in the MAIN window XAML has a handler wired somewhere.
 #   3. Every CheckBox/ComboBox is wired OR consciously allowlisted as a
 #      read-on-demand dialog input (a flow reads .IsChecked/.SelectedItem when

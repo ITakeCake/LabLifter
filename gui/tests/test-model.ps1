@@ -40,7 +40,7 @@ $script:BuildingsConfig = [pscustomobject]@{
     typeCodes = [pscustomobject]@{ LAB = [pscustomobject]@{machine01Role='ask'} }
     roomSizes = [pscustomobject]@{ '55-103' = 90 }
 }
-# Blake's exact ask, plus a building-wide catch-all UNDERNEATH it to prove
+# the exact ask, plus a building-wide catch-all UNDERNEATH it to prove
 # first-match-wins really lets "(none)" override a broader rule.
 $script:RulesConfig = [pscustomobject]@{ rules = @(
     [pscustomobject]@{ building='55'; rooms='103'; types='LAB'; machines='1-60';  apps=$ENG },
@@ -76,7 +76,7 @@ ok ((Get-RuleApps -Rule $script:RulesConfig.rules[1]).Count -eq 0) 'empty inline
 ok ($null -eq (Get-RuleApps -Rule $script:RulesConfig.rules[2])) 'profile-only rule returns $null, not @()'
 ok ((Get-RuleLabel -Rule $script:RulesConfig.rules[1]) -eq '(none)') 'empty list labels as (none)'
 
-'--- Blake''s scenario: #01-60 get ENG, #61-90 get nothing ---'
+'--- the reported scenario: #01-60 get ENG, #61-90 get nothing ---'
 $e20 = Get-FleetExpected -Building '55' -Room '103' -Type 'LAB' -Num 20
 ok ($e20 -and $e20.Apps.Count -eq 19) "machine #20 expects 19 programs (got $($e20.Apps.Count))"
 $e75 = Get-FleetExpected -Building '55' -Room '103' -Type 'LAB' -Num 75

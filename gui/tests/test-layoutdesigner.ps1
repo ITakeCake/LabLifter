@@ -618,7 +618,7 @@ $r = Set-RoomSizeRecord -Building '55' -Room '103' -Count '30'
 ok (-not $r.Ok) 'size write failure reported'
 ok ($null -eq $script:BuildingsConfig.roomSizes.'55-103') 'a size that failed to save is NOT left in memory'
 
-'--- Claim: Blake case - carve 100-120 out of an unassigned 61-oo tail ---'
+'--- Claim: the reported case - carve 100-120 out of an unassigned 61-oo tail ---'
 Reset-Fixture
 $segs = @(Get-CoverageSegments -Building '55' -Room '103' -SeenMax 0)
 $tail = $segs[$segs.Count - 1]
@@ -776,7 +776,7 @@ ok (-not $r.Ok) 'unclaim write failure reported'
 ok (@($script:RulesConfig.rules).Count -eq 1) 'the rule came back'
 
 '--- everything this tab writes can be un-written ---'
-# The round trip Blake asked for: claim it, edit it, split it, then delete it
+# The round trip asked for: claim it, edit it, split it, then delete it
 # and land back where you started.
 Reset-Fixture
 $script:RulesConfig = [pscustomobject]@{ rules = @() }

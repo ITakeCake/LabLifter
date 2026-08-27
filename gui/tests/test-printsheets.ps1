@@ -71,9 +71,9 @@ ok ($out -and (Test-Path $out)) 'fallback file actually written'
 ok ((@($script:LogEvents | Where-Object { $_.Event -eq 'print.pdf_fallback' })).Count -eq 1) 'fallback is logged'
 
 Write-Host "`n--- gatherers (mocked master) ---"
-$script:BuildingsConfig = [pscustomobject]@{ buildings = [pscustomobject]@{ '55' = [pscustomobject]@{ abbr = 'ENG' } } }
+$script:BuildingsConfig = [pscustomobject]@{ buildings = [pscustomobject]@{ '10' = [pscustomobject]@{ abbr = 'ENG' } } }
 $script:FleetRollup = $null   # force the gatherer to call the mocked Get-FleetRollup
-function script:Get-FleetRoomGroups { @{ '55|103' = @{ Building = '55'; Room = '103'; Type = 'LAB'; SeenMax = 2 } } }
+function script:Get-FleetRoomGroups { @{ '10|101' = @{ Building = '10'; Room = '101'; Type = 'LAB'; SeenMax = 2 } } }
 function script:Get-FleetExpected { param($Building,$Room,$Type,$Num) @{ Apps = @('Python','Vivado','ExemptApp') } }
 function script:Test-AppCountsForFleetHealth { param($AppId) $AppId -ne 'ExemptApp' }
 function script:Get-RoomMachineCount { param($Building,$Room,$SeenMax) 3 }
@@ -81,9 +81,9 @@ function script:Get-FleetMark { param($Rec, [string]$RoomKey = '', $Num = $null)
 function script:Import-FleetYears { @{ Current = 2026 } }
 function script:Get-FleetPageFor { param([string]$ImagedGen) 2026 }                          # every gen on the current page
 function script:Get-FleetRollup {
-    @{ '10101LAB34-1' = @{ Machine = '10101LAB34-1'; Building = '55'; Room = '103'; Num = 1; ImagedGen = '2026-01-01'
+    @{ '10101LAB34-1' = @{ Machine = '10101LAB34-1'; Building = '10'; Room = '101'; Num = 1; ImagedGen = '2026-01-01'
                             Installed = @{ Python = $true; Vivado = $true }; GpOk = $true;  CmOk = $true; RecheckApps = @() }
-       '10101LAB34-2' = @{ Machine = '10101LAB34-2'; Building = '55'; Room = '103'; Num = 2; ImagedGen = '2026-01-01'
+       '10101LAB34-2' = @{ Machine = '10101LAB34-2'; Building = '10'; Room = '101'; Num = 2; ImagedGen = '2026-01-01'
                             Installed = @{ Python = $true }; GpOk = $false; CmOk = $true; RecheckApps = @() } }
 }
 $g = @(Get-RecheckSheetRooms)

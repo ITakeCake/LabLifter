@@ -1,5 +1,5 @@
 ﻿# Reconciliation tests: crafted session-log FILES fed through the REAL
-# Get-FleetRollup. Covers Blake's spec verbatim: newest-wins across sticks,
+# Get-FleetRollup. Covers the design spec verbatim: newest-wins across sticks,
 # exact-tie conflicts in plain English, 15 agreeing sticks vs one newer
 # all-clear, same-session ties resolving by file order, plus Layer 1 closure
 # and the Layer 2 issues file round-trip.
@@ -80,7 +80,7 @@ function Roll([string]$m) { $r = Get-FleetRollup; return $r[$m] }
 function StatusOf($rec, $exp = $null) { return (Get-FleetMachineStatus -Rec $rec -Expected $exp) }
 $expX = @{ Apps = @('AppX') }   # a profile that expects AppX, for the colour checks
 
-'=== T1: Blake scenario - err 1:00 (stick aa), fixed 1:02 (stick bb), err again 1:10 (stick ee) -> RED with the 1:10 error ==='
+'=== T1: the field scenario - err 1:00 (stick aa), fixed 1:02 (stick bb), err again 1:10 (stick ee) -> RED with the 1:10 error ==='
 Clear-Logs
 New-SessionLog 'RECON-T1' '20260730_125900' 'aaaaaa' @( (L-err '2026-07-30 13:00:00.000' 'AppX' 'E26') ) | Out-Null
 New-SessionLog 'RECON-T1' '20260730_130100' 'bbbbbb' @( (L-ok  '2026-07-30 13:02:00.000' 'AppX') ) | Out-Null

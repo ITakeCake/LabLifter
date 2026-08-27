@@ -1,5 +1,5 @@
 # Proves the "App Opened?" chip and "Open App" button appear ONLY for apps that
-# genuinely still require a confirmed first launch. Blake, 2026-07-30: not
+# genuinely still require a confirmed first launch. 2026-07-30: not
 # opening must not count as a failure unless the app specifically needs it.
 # Paths are DERIVED, never hard-coded: this suite has to run from a USB stick,
 # a second PC, or a clone under any username. $LabRoot is the LabDeploy folder
@@ -31,8 +31,8 @@ function Get-Vis($id) {
     return @{ Chip = "$($card.OBox.Visibility)"; Btn = "$($card.BtnOpenApp.Visibility)" }
 }
 
-'--- apps Blake retired: the CHIP must be gone (the button is not chip-gated) ---'
-# SPEC CHANGED 2026-08-06 (Blake): 'Open app' is offered on ANY INSTALLED card,
+'--- retired apps: the CHIP must be gone (the button is not chip-gated) ---'
+# SPEC CHANGED 2026-08-06: 'Open app' is offered on ANY INSTALLED card,
 # not just needsOpen ones - after installing something you often just want to
 # launch it, and hunting the Start Menu is the friction this tool removes. So
 # these apps keep the button and lose only the confirmation chip. 'Show setup
