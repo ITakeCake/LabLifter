@@ -34,8 +34,8 @@ $m = [regex]::Match($src, "(?s)\[xml\]\`$xaml = @'\r?\n(.*?)\r?\n'@")
 $win = [System.Windows.Markup.XamlReader]::Load((New-Object System.Xml.XmlNodeReader $x))
 
 # populate just enough to look real
-$win.FindName('txtHostname').Text = '10101LAB34-20'
-$win.FindName('txtDecode').Text   = 'ENG 103 #20'
+$win.FindName('txtHostname').Text = '20103LAB5-17'
+$win.FindName('txtDecode').Text   = 'ENG 103 #17'
 $win.FindName('txtDecode').Visibility = 'Visible'
 $win.FindName('txtUser').Text     = 'student01'
 $win.FindName('txtSummary').Text  = '17 / 19 installed'
@@ -214,27 +214,49 @@ if (-not $script:ENGAPPS.Count) {
     $script:ENGAPPS = @($script:AppsConfig.apps.PSObject.Properties.Name | Where-Object { $_ -notlike '_*' } | Select-Object -First 12)
 }
 function Get-FleetRollup {
+    # Screenshot fleet: 3 buildings, 4 rooms, 98 machines. Mostly green, with
+    # every tile state present: yellow (partial), red (failed), purple (GP/CM
+    # owed), blue (reported missing), broken (X), grey gaps, a never-seen slot
+    # stub, and verified/override mark notches.
     $r = @{}
-    for ($n = 1; $n -le 44; $n++) {
-        $inst = @{}
-        foreach ($a in $script:ENGAPPS) { $inst[$a] = $true }
-        $fail = New-Object System.Collections.ArrayList
-        if ($n -le 2)  { [void]$fail.Add('RockwellCCW E26 @ 07-28 14:02') }
-        if ($n -eq 19) { $inst.Remove(@($script:ENGAPPS)[0]); $inst.Remove(@($script:ENGAPPS)[1]) }
-        $r["10101LAB34-$('{0:D2}' -f $n)"] = @{
-            Machine = "10101LAB34-$('{0:D2}' -f $n)"; Building='55'; BuildingAbbr='ENG'; Room='103'; Type='LAB'
-            Num = $n; Installed=$inst; Opened=@{}; Failures=$fail; LastSeen=(Get-Date '2026-07-28 14:02')
-            Sessions=3; Reimaged=0; PriorSessions=0; Imaged='2026-07-11'; ImagedGen='2026-07-11'
-            ImageFilePresent=$true; GpLast=(Get-Date '2026-07-27 09:00'); GpOk=$true
-            CmLast=$null; CmOk=$false; CmDetail=''; Sticks=@{'01'=$true}; RecheckApps=@() }
+    $rooms = @(
+        @{ B = '20'; A = 'ENG';  R = '103'; N = 44 },
+        @{ B = '20'; A = 'ENG';  R = '205'; N = 12 },
+        @{ B = '10'; A = 'MAIN'; R = '101'; N = 24 },
+        @{ B = '30'; A = 'SCI';  R = '150'; N = 18 }
+    )
+    foreach ($rm in $rooms) {
+        for ($n = 1; $n -le $rm.N; $n++) {
+            $mach = '{0}{1}LAB5-{2:D2}' -f $rm.B, $rm.R, $n
+            $inst = @{}
+            foreach ($a in $script:ENGAPPS) { $inst[$a] = $true }
+            $fail = New-Object System.Collections.ArrayList
+            $cmOk = $true; $cmLast = (Get-Date '2026-08-20 09:00')
+            if ($rm.R -eq '103' -and $n -eq 19) { $inst.Remove(@($script:ENGAPPS)[0]) }
+            if ($rm.R -eq '101' -and $n -eq 13) { $inst.Remove(@($script:ENGAPPS)[0]) }
+            if ($rm.R -eq '103' -and $n -eq 2)  { $inst = @{}; [void]$fail.Add('RockwellCCW E26 @ 08-20 14:02') }
+            if ($rm.R -eq '150' -and $n -eq 12) { $inst = @{}; [void]$fail.Add('MATLAB E23 @ 08-19 11:40') }
+            if ($rm.R -eq '103' -and $n -eq 40) { $cmOk = $false; $cmLast = $null }
+            if ($rm.R -eq '150' -and $n -eq 5)  { $cmOk = $false; $cmLast = $null }
+            $r[$mach] = @{
+                Machine = $mach; Building = $rm.B; BuildingAbbr = $rm.A; Room = $rm.R; Type = 'LAB'
+                Num = $n; Installed = $inst; Opened = @{}; Failures = $fail; LastSeen = (Get-Date '2026-08-20 14:02')
+                Sessions = 3; Reimaged = 0; PriorSessions = 0; Imaged = '2026-07-11'; ImagedGen = '2026-07-11'
+                ImageFilePresent = $true; GpLast = (Get-Date '2026-08-19 09:00'); GpOk = $true
+                CmLast = $cmLast; CmOk = $cmOk; CmDetail = ''; Sticks = @{ '01' = $true }; RecheckApps = @() }
+        }
     }
     $r['SPARE-LAPTOP-7'] = @{
-        Machine='SPARE-LAPTOP-7'; Building=''; BuildingAbbr=''; Room=''; Type=''; Num=$null
-        Installed=@{}; Opened=@{}; Failures=(New-Object System.Collections.ArrayList)
-        Sessions=1; Reimaged=0; PriorSessions=0; Sticks=@{'01'=$true}; RecheckApps=@() }
+        Machine = 'SPARE-LAPTOP-7'; Building = ''; BuildingAbbr = ''; Room = ''; Type = ''; Num = $null
+        Installed = @{}; Opened = @{}; Failures = (New-Object System.Collections.ArrayList)
+        Sessions = 1; Reimaged = 0; PriorSessions = 0; Sticks = @{ '01' = $true }; RecheckApps = @() }
     return $r
 }
+# every machine is EXPECTED to carry the demo app set - without rules for the
+# fixture buildings, expected would be empty and red/yellow could never render
+function Get-FleetExpected { param($Building, $Room, $Type, $Num) @{ Profile = 'EXAMPLE-101'; Apps = @($script:ENGAPPS) } }
 function Publish-FleetIssues { }
+function Write-LabLog { }   # harness: log lines go nowhere
 $script:BrushText   = New-FrozenBrush 0xE0 0xE0 0xE0
 $script:BrushMuted  = New-FrozenBrush 0x78 0x78 0x78
 $script:BrushCard   = New-FrozenBrush 0x2D 0x2D 0x32
@@ -285,10 +307,11 @@ $script:FleetTitleBase = ''
 # never reached) so a screenshot exercises every tile state including the blue
 # "reported missing" and the mark notch.
 $script:FleetMarks = @{
-    '10101LAB34-06|2026-07-11' = @{ State = 'missing';  Ts = (Get-Date '2026-08-01'); By = 'master' }
-    'room:ENG 103|47'           = @{ State = 'missing';  Ts = (Get-Date '2026-08-01'); By = 'master' }
-    '10101LAB34-11|2026-07-11' = @{ State = 'override'; Ts = (Get-Date '2026-08-02'); By = 'master' }
-    '10101LAB34-01|2026-07-11' = @{ State = 'verified'; Ts = (Get-Date '2026-08-03'); By = 'master' }
+    '20103LAB5-06|2026-07-11' = @{ State = 'missing';  Ts = (Get-Date '2026-08-21'); By = 'master' }
+    '20103LAB5-09|2026-07-11' = @{ State = 'broken';   Ts = (Get-Date '2026-08-21'); By = 'master' }
+    'room:ENG 103|47'         = @{ State = 'missing';  Ts = (Get-Date '2026-08-01'); By = 'master' }
+    '20103LAB5-11|2026-07-11' = @{ State = 'override'; Ts = (Get-Date '2026-08-02'); By = 'master' }
+    '20103LAB5-01|2026-07-11' = @{ State = 'verified'; Ts = (Get-Date '2026-08-03'); By = 'master' }
 }
 $script:FleetWatermarks = @{}
 # Removed = the delete bin. A page in it enables the header's Restore Year

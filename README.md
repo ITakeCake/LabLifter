@@ -32,8 +32,8 @@ that puts the fleet's install status on one dashboard wall.
 ![Rooms & Rules Designer](docs/screenshots/gui-designer.png)
 *The Layout Designer (Rooms & Rules): every building the hostname decoder knows, purple when it carries deployment rules. Click through to assign per-machine-range app sets on a visual ruler.*
 
-![Sticks tab](docs/screenshots/gui-sticks.png)
-*The stick fleet: every known USB deployment stick, its sync state against the master catalog, and one-button update-all when sticks are plugged in.*
+![Deployment Tracker](docs/screenshots/gui-tracker.png)
+*The Deployment Tracker: every machine in every room as a tile, same palette as the dashboard wall. Green done, yellow partial, purple owes GP/CM, blue reported missing, an X for broken, grey never seen.*
 
 ## Why it's built this way
 
