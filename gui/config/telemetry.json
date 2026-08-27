@@ -1,10 +1,10 @@
 {
   "_note": "Telemetry plane endpoint config. NON-SECRET - committed and shipped to sticks as a MasterConfigFile. The bearer token lives separately in tokens.json (gitignored).",
-  "_fill_in": "After deploying the Worker (fleetboard-api), replace REPLACE in obsUrl/logUrl with the account's workers.dev subdomain (or a custom domain). While the URL still says REPLACE, every push is a safe no-op.",
+  "_fill_in": "After deploying the Worker (labboard-api), replace REPLACE in obsUrl/logUrl with the account's workers.dev subdomain (or a custom domain). While the URL still says REPLACE, every push is a safe no-op.",
   "_switch_off": "Set enabled=false to turn telemetry off fleet-wide via a normal config edit + stick sync. No code change.",
   "enabled": true,
-  "obsUrl": "https://fleetboard-api.REPLACE.workers.dev/obs",
-  "logUrl": "https://fleetboard-api.REPLACE.workers.dev/log",
+  "obsUrl": "https://labboard-api.REPLACE.workers.dev/obs",
+  "logUrl": "https://labboard-api.REPLACE.workers.dev/log",
   "timeoutSec": 3,
   "chunkSize": 500,
   "backfill": true

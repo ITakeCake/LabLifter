@@ -6698,7 +6698,7 @@ $script:FleetColors = @{
     purple = [System.Windows.Media.SolidColorBrush]::new([System.Windows.Media.Color]::FromRgb(0x4A,0x2E,0x6E))
     orange = [System.Windows.Media.SolidColorBrush]::new([System.Windows.Media.Color]::FromRgb(0x7A,0x3C,0x0A))
 }
-# PC-tile fills match the FleetBoard dashboard's wall palette EXACTLY (Blake,
+# PC-tile fills match the LabBoard dashboard's wall palette EXACTLY (Blake,
 # 2026-08-26): a machine that is green on the wall is the SAME green here, so
 # nobody has to translate between the two views. ONLY the machine tiles, their
 # room tally chips, the never-seen stub and the room progress fill use these -

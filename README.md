@@ -64,7 +64,7 @@ flowchart LR
     S -->|HTTPS push: observations| W[Ingest Worker]
     MG -->|HTTPS push: fleet marks + display configs| W
     W --> D[(D1 database)]
-    D --> P[FleetBoard dashboard<br>password gated]
+    D --> P[LabBoard dashboard<br>password gated]
     MG -.->|PULLS mark requests:<br>five status words, nothing else| W
 ```
 
@@ -102,7 +102,7 @@ is the dashed pull, and it can carry nothing but the five status words.
   replay the fleet's state as of any past day.
 - **Defensive engineering throughout**: every config the engine reads is linted by
   [`gui/tests`](gui/tests) (29 test files); the fold logic that turns raw observations
-  into the wall is covered by a Node test suite in the companion FleetBoard repo;
+  into the wall is covered by a Node test suite in the companion LabBoard repo;
   hostile inputs (a machine's PATH, a vendor installer's exit codes) are treated as
   untrusted and can't take down a scan.
 
@@ -116,7 +116,7 @@ The health pill watches imaging date, management client, and machine certificate
 per-room configurable, down to two dots for rooms that never get certs.
 
 **Deployment Tracker** *(master only)*, the wall, locally: every machine in every
-room as a colored tile (same palette as the FleetBoard dashboard), folded from every
+room as a colored tile (same palette as the LabBoard dashboard), folded from every
 session log with generation awareness, a re-imaged machine owes nothing to last
 year's errors. Tech marks (Verified / Override / Report missing), print sheets, CSV
 export, year pages.
@@ -148,7 +148,7 @@ toggles. Saved per drive, so every stick keeps its own.
 | Path | What it is |
 |---|---|
 | [`gui/`](gui/) | The deployment tool: one-file WPF app (`Deploy-LabGUI.ps1`, ~20.7k lines), JSON config set, stick-sync scripts, test suite |
-| **[FleetBoard](https://github.com/ITakeCake/fleetboard)** (companion repo) | The telemetry plane: Cloudflare Worker (bearer-token ingest into D1) + the dashboard (Basic Auth, fleet fold, time machine, printable reports) |
+| **[LabBoard](https://github.com/ITakeCake/labboard)** (companion repo) | The telemetry plane: Cloudflare Worker (bearer-token ingest into D1) + the dashboard (Basic Auth, fleet fold, time machine, printable reports) |
 | [`payloads/`](payloads/) | Sample installer-automation payloads: silent-install configs, a PATH-repair script, VS Code extension seeding |
 | [`docs/SUPPORTED-APPS.md`](docs/SUPPORTED-APPS.md) | Generated catalog of all 81 apps with per-card automation flags |
 
@@ -178,7 +178,7 @@ every network call is a no-op; licence codes live in `config/licences.json` (git
 see `licences.example.json`); installer payloads are looked up per-card and simply show
 as "source missing" (E21) until staged. Nothing crashes on a bare clone.
 
-The telemetry plane (Worker + dashboard) lives in the **companion FleetBoard repo**,
+The telemetry plane (Worker + dashboard) lives in the **companion LabBoard repo**,
 which carries its own deploy guide: create a D1 database, fill the placeholders,
 `wrangler deploy`, done. The GUI needs only its URL in `config/telemetry.json`.
 
@@ -186,7 +186,7 @@ which carries its own deploy guide: create a D1 database, fill the placeholders,
 
 ```powershell
 gui\tests\test-configlint.ps1        # config invariants
-# the telemetry plane's Node suites live in the companion FleetBoard repo
+# the telemetry plane's Node suites live in the companion LabBoard repo
 ```
 
 ## License

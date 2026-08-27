@@ -22,6 +22,12 @@
                                                    "Python",
                                                    "VSCode"
                                                ]
-                                  }
+                                  },
+                  "SCI":  {
+                              "displayName":  "SCI",
+                              "apps":  [
+
+                                       ]
+                          }
               }
 }
