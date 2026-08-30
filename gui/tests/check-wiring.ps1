@@ -67,6 +67,14 @@ $readOnDemand = @{
     chkCapAsk      = 'read by Invoke-CaptureFlow'
     chkCapLast     = 'read by Invoke-CaptureFlow'
     chkCapOffload  = 'read by Invoke-CaptureFlow'
+    chkCapAllRooms = 'read by Complete-Capture'
+    chkAsgPKI      = 'read by Load-AssignRoom and the assign save path'
+    chkAsgImage    = 'read by Load-AssignRoom and the assign save path'
+    chkLedNumbered = 'read by Load-LedgerRoomSettings and the ledger save path'
+    chkWgSilent    = 'read by Invoke-WingetCaptureFlow'
+    chkWgScope     = 'read by Invoke-WingetCaptureFlow'
+    chkWgAcceptPkg = 'read by Invoke-WingetCaptureFlow'
+    chkWgAcceptSrc = 'read by Invoke-WingetCaptureFlow'
 }
 
 $m = [regex]::Match($src, "(?s)\[xml\]\`$xaml = @'\r?\n(.*?)\r?\n'@")

@@ -1,0 +1,88 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  suites:
+    name: PowerShell test suites
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      # Windows PowerShell 5.1 is the floor the tool ships against, and the
+      # stick has no newer runtime, so the suites run under powershell.exe
+      # rather than pwsh on purpose.
+      - name: Report PowerShell version
+        shell: powershell
+        run: $PSVersionTable | Format-List
+
+      # Three suites drive a live WPF window and capture screenshots, so they
+      # need an interactive desktop and stay bench only:
+      #   smoke.ps1, shoot-gui.ps1, shoot-dialog.ps1
+      - name: Run suites
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Continue'
+          $benchOnly = @('smoke.ps1', 'shoot-gui.ps1', 'shoot-dialog.ps1')
+          $suites = Get-ChildItem gui\tests\*.ps1 |
+                    Where-Object { $benchOnly -notcontains $_.Name } |
+                    Sort-Object Name
+          $failed = @()
+          foreach ($s in $suites) {
+            Write-Host "::group::$($s.Name)"
+            & powershell.exe -NoProfile -ExecutionPolicy Bypass -File $s.FullName
+            $rc = $LASTEXITCODE
+            Write-Host "::endgroup::"
+            if ($rc -ne 0) {
+              $failed += $s.Name
+              Write-Host "::error title=$($s.Name)::suite failed with exit code $rc"
+            }
+          }
+          Write-Host ""
+          Write-Host "$($suites.Count - $failed.Count) of $($suites.Count) suites passed."
+          if ($failed.Count) {
+            Write-Host "Failed: $($failed -join ', ')"
+            exit 1
+          }
+
+  catalog:
+    name: Catalog docs match apps.json
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      # docs/SUPPORTED-APPS.md and the wiki are generated from apps.json. This
+      # job does not regenerate them, it only fails if the card count printed in
+      # the docs no longer matches the catalog, which is the drift that actually
+      # misleads a reader.
+      - name: Compare card count
+        shell: powershell
+        run: |
+          $json = Get-Content gui\config\apps.json -Raw | ConvertFrom-Json
+          $cards = @($json.apps.PSObject.Properties |
+                     Where-Object { -not $_.Name.StartsWith('_') }).Count
+          Write-Host "apps.json declares $cards cards."
+
+          $doc = Get-Content docs\SUPPORTED-APPS.md -Raw
+          $m = [regex]::Match($doc, '\*\*(\d+) application cards')
+          if (-not $m.Success) {
+            Write-Host "::error::could not find the card count in docs/SUPPORTED-APPS.md"
+            exit 1
+          }
+          $documented = [int]$m.Groups[1].Value
+          Write-Host "docs/SUPPORTED-APPS.md claims $documented cards."
+
+          if ($cards -ne $documented) {
+            Write-Host "::error::catalog drift: apps.json has $cards cards, the docs claim $documented. Regenerate docs/SUPPORTED-APPS.md and the wiki."
+            exit 1
+          }
+          Write-Host "Catalog and docs agree."
