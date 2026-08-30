@@ -2,6 +2,10 @@
 
 # LabLifter
 
+[![tests](https://github.com/ITakeCake/LabLifter/actions/workflows/tests.yml/badge.svg)](https://github.com/ITakeCake/LabLifter/actions/workflows/tests.yml)
+[![release](https://img.shields.io/github/v/release/ITakeCake/LabLifter)](https://github.com/ITakeCake/LabLifter/releases/latest)
+[![license](https://img.shields.io/github/license/ITakeCake/LabLifter)](LICENSE)
+
 Deployment tooling for the installers you dread: the gap Intune can't cover.
 
 Ordinary software, browsers, utilities, anything with a clean silent MSI, mass-deploys
